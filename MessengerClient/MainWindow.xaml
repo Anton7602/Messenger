@@ -1,0 +1,14 @@
+﻿<Window x:Class="MessengerClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MessengerClient"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <TextBox x:Name="tbIPadress" HorizontalAlignment="Left" Margin="47,25,0,0" TextWrapping="Wrap" Text="127.0.0.1" VerticalAlignment="Top" Width="345"/>
+        <TextBox x:Name="tbPort" HorizontalAlignment="Left" Margin="424,25,0,0" TextWrapping="Wrap" Text="8302" VerticalAlignment="Top" Width="190"/>
+        <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Left" Margin="638,24,0,0" VerticalAlignment="Top" Width="143" Click="btnOpenHost_Click"/>
+    </Grid>
+</Window>
