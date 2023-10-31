@@ -37,7 +37,7 @@
                                 <ColumnDefinition Width="5*" />
                             </Grid.ColumnDefinitions>
 
-                            <ToggleButton Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Command="{Binding connectionCommand}" CommandParameter="{Binding CurrentURL}" IsChecked="{Binding IsOnline, Mode=OneWay}" Background="White"  Margin="4" BorderThickness="0">
+                            <ToggleButton Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Command="{Binding connectionCommand}" CommandParameter="{Binding CurrentURL}" IsChecked="{Binding IsOnline, Mode=OneWay}" Background="White"  Margin="4" BorderThickness="0">
                                 <ToggleButton.Style>
                                     <Style TargetType="ToggleButton">
                                         <Setter Property="Content">

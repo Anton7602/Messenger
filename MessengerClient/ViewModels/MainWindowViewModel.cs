@@ -156,13 +156,26 @@ namespace MessengerClient.ViewModels
                 client = new ServiceMessengerClient(new System.ServiceModel.InstanceContext(this));
                 Uri connectAddress = new Uri($"net.tcp://{url}");
                 client.Endpoint.Address = new System.ServiceModel.EndpointAddress(connectAddress);
-                ID = client.Connect(UserNameTextBoxText);
-                IsOnline = true;
-                StatusTextBoxText = "Connected";
-                UserList.Clear();
-                foreach (var chatMember in client.GetUsersList())
+                if (IsUsernameVaild(UserNameTextBoxText))
                 {
-                    userList.Add(chatMember);
+                    try
+                    {
+                        ID = client.Connect(UserNameTextBoxText);
+                        IsOnline = true;
+                        StatusTextBoxText = "Connected";
+                        UserList.Clear();
+                        foreach (var chatMember in client.GetUsersList())
+                        {
+                            userList.Add(chatMember);
+                        }
+                    }
+                    catch
+                    {
+                        StatusTextBoxText = "Connection failed";
+                    }
+                } else
+                {
+                    StatusTextBoxText = "Provided invalid username";
                 }
             }
         }
@@ -188,6 +201,15 @@ namespace MessengerClient.ViewModels
             {
                 Disconnect();
             }
+        }
+
+        private bool IsUsernameVaild(string username)
+        {
+            if (username  == null || username.Length==0)
+            {
+                return false;
+            }
+            return true;
         }
 
         public void OnWindowClosing(object sender, CancelEventArgs e)
