@@ -2,10 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Security.Policy;
 using System.Security.RightsManagement;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace MessengerClient.ViewModels
 {
@@ -113,7 +116,7 @@ namespace MessengerClient.ViewModels
             }
         }
 
-        private string _statusTextBoxText = "Offline";
+        private string _statusTextBoxText = "Disconnected";
         public string StatusTextBoxText
         {
             get { return _statusTextBoxText; }
@@ -146,7 +149,7 @@ namespace MessengerClient.ViewModels
             sendMessage = new RelayCommand<object>(SendMessage);
         }
 
-        private void HandleConnection(object url)
+        private void Connect(string url)
         {
             if (!IsOnline)
             {
@@ -155,27 +158,56 @@ namespace MessengerClient.ViewModels
                 client.Endpoint.Address = new System.ServiceModel.EndpointAddress(connectAddress);
                 ID = client.Connect(UserNameTextBoxText);
                 IsOnline = true;
-                StatusTextBoxText = "Online";
+                StatusTextBoxText = "Connected";
                 UserList.Clear();
-                foreach(var chatMember in client.GetUsersList())
+                foreach (var chatMember in client.GetUsersList())
                 {
                     userList.Add(chatMember);
                 }
-            } else
+            }
+        }
+
+        private void Disconnect()
+        {
+            if (IsOnline)
             {
                 client.Disconnect(ID);
                 IsOnline = false;
                 UserList.Clear();
-                StatusTextBoxText = "Offline";
+                StatusTextBoxText = "Disconnected";
             }
+        }
 
+        private void HandleConnection(object url)
+        {
+            if (!IsOnline)
+            {
+                Connect(url.ToString());
+
+            } else
+            {
+                Disconnect();
+            }
+        }
+
+        public void OnWindowClosing(object sender, CancelEventArgs e)
+        {
+            Disconnect();
+        }
+
+        public void OnKeyPressed(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                SendMessage(InputMessage);
+            }
         }
 
         private void SendMessage(object message)
         {
             if (IsOnline)
             {
-                String text = message as String;
+                string text = message.ToString();
                 if (!text.Equals(String.Empty))
                 {
                     client.SendMessage(text, ID);

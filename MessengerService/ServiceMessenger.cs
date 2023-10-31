@@ -84,7 +84,7 @@ namespace MessengerService
         }
 
         private void NotifyClientsAboutEvent(MessengerEvent notificationEvent, Object parameter) {
-            //List<User> unresponsiveUsers = new List<User>();
+            List<User> unresponsiveUsers = new List<User>();
             foreach (User client in userList)
             {
                 try
@@ -104,10 +104,10 @@ namespace MessengerService
                 }
                 catch
                 {
-                    //unresponsiveUsers.Add(client);
+                    unresponsiveUsers.Add(client);
                 }
             }
-            //DisconnectUnresponsiveUsers(unresponsiveUsers);
+            DisconnectUnresponsiveUsers(unresponsiveUsers);
         }
     }
 }

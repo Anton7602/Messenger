@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
+using System.Windows.Input;
 
 namespace MessengerServer.ViewModels
 {
@@ -160,7 +161,7 @@ namespace MessengerServer.ViewModels
             sendMessage = new RelayCommand<object>(SendMessage);
         }
 
-        private void HandleConnection(object url)
+        public void Connect(string url)
         {
             if (!IsOnline)
             {
@@ -183,18 +184,32 @@ namespace MessengerServer.ViewModels
                         StatusTextBoxText = ex.Message;
                         host.removeEndpoint();
                     }
-                } else
+                }
+                else
                 {
                     StatusTextBoxText = "Provided invalid IP/Port";
                 }
             }
+        }
+
+        public void Disconnect()
+        {
+            StatusTextBoxText = "Disrupting connection";
+            host.stopService();
+            userList.Clear();
+            StatusTextBoxText = "Offline";
+            IsOnline = false;
+        }
+
+        private void HandleConnection(object url)
+        {
+            if (!IsOnline)
+            {
+                Connect(url.ToString());
+            }
             else
             {
-                StatusTextBoxText = "Disrupting connection";
-                host.stopService();
-                userList.Clear();
-                StatusTextBoxText = "Offline";
-                IsOnline = false;
+                Disconnect();
             }
         }
 
@@ -202,7 +217,7 @@ namespace MessengerServer.ViewModels
         {
             if (IsOnline)
             {
-                String text = message as String;
+                string text = message.ToString();
                 if (!text.Equals(String.Empty))
                 {
                     host.Messenger.SendMessage(text, 0);
@@ -237,6 +252,19 @@ namespace MessengerServer.ViewModels
             if (e != null && e is User)
             {
                 userList.Remove((e as User).ToString());
+            }
+        }
+
+        public void OnWindowClosing(object sender, EventArgs e)
+        {
+            Disconnect();
+        }
+
+        public void OnKeyPressed(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                SendMessage(InputMessage);
             }
         }
 

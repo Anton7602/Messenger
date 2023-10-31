@@ -67,19 +67,19 @@
                                         <ColumnDefinition Width="2*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBox HorizontalAlignment="Stretch" Grid.Column="0"  Margin="2" Text="{Binding IpAddressTextBoxTextFirst}" Visibility="{Binding IsOnline, Converter={StaticResource falseToVisibility}}" MaxLength="3" PreviewTextInput="TextBox_PreviewTextInput"/>
+                                    <TextBox HorizontalAlignment="Stretch" Grid.Column="0"  Margin="2" Text="{Binding IpAddressTextBoxTextFirst, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsOnline, Converter={StaticResource falseToVisibility}}" MaxLength="3" PreviewTextInput="TextBox_PreviewTextInput"/>
                                     <TextBlock HorizontalAlignment="Center" Grid.Column="0"  Margin="3" Text="{Binding IpAddressTextBoxTextFirst}" Visibility="{Binding IsOnline, Converter={StaticResource trueToVisibility}}"/>
                                     <TextBlock Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Text="."/>
-                                    <TextBox HorizontalAlignment="Stretch" Grid.Column="1"  Margin="2" Text="{Binding IpAddressTextBoxTextSecond}" Visibility="{Binding IsOnline, Converter={StaticResource falseToVisibility}}" MaxLength="3" PreviewTextInput="TextBox_PreviewTextInput"/>
+                                    <TextBox HorizontalAlignment="Stretch" Grid.Column="1"  Margin="2" Text="{Binding IpAddressTextBoxTextSecond, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsOnline, Converter={StaticResource falseToVisibility}}" MaxLength="3" PreviewTextInput="TextBox_PreviewTextInput"/>
                                     <TextBlock HorizontalAlignment="Center" Grid.Column="1"  Margin="3" Text="{Binding IpAddressTextBoxTextSecond}" Visibility="{Binding IsOnline, Converter={StaticResource trueToVisibility}}"/>
                                     <TextBlock Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Text="."/>
-                                    <TextBox HorizontalAlignment="Stretch" Grid.Column="2"  Margin="2" Text="{Binding IpAddressTextBoxTextThird}" Visibility="{Binding IsOnline, Converter={StaticResource falseToVisibility}}" MaxLength="3" PreviewTextInput="TextBox_PreviewTextInput"/>
+                                    <TextBox HorizontalAlignment="Stretch" Grid.Column="2"  Margin="2" Text="{Binding IpAddressTextBoxTextThird, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsOnline, Converter={StaticResource falseToVisibility}}" MaxLength="3" PreviewTextInput="TextBox_PreviewTextInput"/>
                                     <TextBlock HorizontalAlignment="Center" Grid.Column="2"  Margin="3" Text="{Binding IpAddressTextBoxTextThird}" Visibility="{Binding IsOnline, Converter={StaticResource trueToVisibility}}"/>
                                     <TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Text="."/>
-                                    <TextBox HorizontalAlignment="Stretch" Grid.Column="3"  Margin="2" Text="{Binding IpAddressTextBoxTextForth}" Visibility="{Binding IsOnline, Converter={StaticResource falseToVisibility}}" MaxLength="3" PreviewTextInput="TextBox_PreviewTextInput"/>
+                                    <TextBox HorizontalAlignment="Stretch" Grid.Column="3"  Margin="2" Text="{Binding IpAddressTextBoxTextForth, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsOnline, Converter={StaticResource falseToVisibility}}" MaxLength="3" PreviewTextInput="TextBox_PreviewTextInput"/>
                                     <TextBlock HorizontalAlignment="Center" Grid.Column="3"  Margin="3" Text="{Binding IpAddressTextBoxTextForth}" Visibility="{Binding IsOnline, Converter={StaticResource trueToVisibility}}"/>
                                     <TextBlock Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Text=":"/>
-                                    <TextBox HorizontalAlignment="Stretch" Grid.Column="4"  Margin="2" Text="{Binding PortTextBoxText}" Visibility="{Binding IsOnline, Converter={StaticResource falseToVisibility}}" MaxLength="5" PreviewTextInput="TextBox_PreviewTextInput"/>
+                                    <TextBox HorizontalAlignment="Stretch" Grid.Column="4"  Margin="2" Text="{Binding PortTextBoxText, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsOnline, Converter={StaticResource falseToVisibility}}" MaxLength="5" PreviewTextInput="TextBox_PreviewTextInput"/>
                                     <TextBlock HorizontalAlignment="Left" Grid.Column="4"  Margin="3" Text="{Binding PortTextBoxText}" Visibility="{Binding IsOnline, Converter={StaticResource trueToVisibility}}"/>
                                 </Grid>
 
@@ -105,14 +105,14 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <ListBox Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" ItemsSource="{Binding MessagesList}"/>
+            <ListBox x:Name="MessengesListbox" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" ItemsSource="{Binding MessagesList}" Loaded="MessengesListbox_Loaded"/>
 
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="11*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" Text="{Binding InputMessage}"/>
+                <TextBox Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" Text="{Binding InputMessage, UpdateSourceTrigger=PropertyChanged}"/>
                 <Button Grid.Column="1" Background="White" Margin="15" BorderThickness="0" Command="{Binding sendMessage}" CommandParameter="{Binding InputMessage}">
                     <Image MaxHeight="60" MaxWidth="60" Source="..\Resourses\send.png"/>
                 </Button>
