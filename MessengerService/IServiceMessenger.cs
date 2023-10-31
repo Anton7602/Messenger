@@ -15,6 +15,8 @@ namespace MessengerService
 
         [OperationContract]
         void Disconnect(int id);
+        [OperationContract]
+        List<string> GetUsersList();
 
         [OperationContract(IsOneWay = true)]
         void SendMessage(string message, int id);
@@ -22,6 +24,12 @@ namespace MessengerService
 
     public interface IServerMessengerCallback
     {
+        [OperationContract(IsOneWay = true)]
+        void ChatMemberLeftCallback(string chatMember);
+
+        [OperationContract(IsOneWay = true)]
+        void ChatMemberJoinedCallback(string chatMember);
+
         [OperationContract(IsOneWay = true)]
         void MessageCallback(string message);
     }

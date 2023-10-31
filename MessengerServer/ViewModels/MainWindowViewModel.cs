@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Text.RegularExpressions;
 
 namespace MessengerServer.ViewModels
 {
@@ -13,8 +16,8 @@ namespace MessengerServer.ViewModels
         #region Fields and Properties
         private MessengerServiceHost host = new MessengerServiceHost();
 
-        private List<User> userList = new List<User>();
-        public List<User> UserList 
+        private ObservableCollection<string> userList = new ObservableCollection<string>();
+        public ObservableCollection<string> UserList 
         { 
             get { return userList; } 
             set
@@ -35,7 +38,7 @@ namespace MessengerServer.ViewModels
             }
         }
 
-        private int _ipAddressTextBoxTextFirst = 127;
+        private int _ipAddressTextBoxTextFirst = 192;
         public int IpAddressTextBoxTextFirst
         {
             get { return _ipAddressTextBoxTextFirst; }
@@ -46,7 +49,7 @@ namespace MessengerServer.ViewModels
             }
         }
 
-        private int _ipAddressTextBoxTextSecond = 0;
+        private int _ipAddressTextBoxTextSecond = 168;
         public int IpAddressTextBoxTextSecond
         {
             get { return _ipAddressTextBoxTextSecond; }
@@ -68,7 +71,7 @@ namespace MessengerServer.ViewModels
             }
         }
 
-        private int _ipAddressTextBoxTextForth = 1;
+        private int _ipAddressTextBoxTextForth = 0;
         public int IpAddressTextBoxTextForth
         {
             get { return _ipAddressTextBoxTextForth; }
@@ -128,6 +131,8 @@ namespace MessengerServer.ViewModels
         public RelayCommand<object> connectionCommand { get; private set; }
         public RelayCommand<object> sendMessage { get; private set; }
         #endregion
+        //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
         public MainWindowViewModel()
         {
@@ -139,8 +144,8 @@ namespace MessengerServer.ViewModels
                     MessagesList.Add(message.ToString());
                 }
             }
-            string publicIP = GetPublicIpAddress();
-            string[] elementsOfIp = publicIP.Split('.');
+            string relevantIP = GetPrivateIpAddress();
+            string[] elementsOfIp = relevantIP.Split('.');
             if (elementsOfIp.Length == 4)
             {
                 IpAddressTextBoxTextFirst = int.Parse(elementsOfIp[0]);
@@ -148,7 +153,9 @@ namespace MessengerServer.ViewModels
                 IpAddressTextBoxTextThird = int.Parse(elementsOfIp[2]);
                 IpAddressTextBoxTextForth = int.Parse(elementsOfIp[3]);
             }
-            host.Messenger.ServerCallback += MessageCallbackHandler;
+            host.Messenger.ServerUserAddedCallback += UserAddedCallbackHandler;
+            host.Messenger.ServerUserRemovedCallback += UserRemovedCallbackHandler;
+            host.Messenger.ServerMessageCallback += MessageCallbackHandler;
             connectionCommand = new RelayCommand<object>(HandleConnection);
             sendMessage = new RelayCommand<object>(SendMessage);
         }
@@ -158,14 +165,34 @@ namespace MessengerServer.ViewModels
             if (!IsOnline)
             {
                 StatusTextBoxText = "Establishing connection";
-                host.startService(url as string);
-                StatusTextBoxText = "Online";
-                IsOnline = true;
+                if (IsValidIP(url as string))
+                {
+                    try
+                    {
+                        host.startService(url as string);
+                        StatusTextBoxText = "Online";
+                        IsOnline = true;
+                    }
+                    catch (System.ServiceModel.AddressAlreadyInUseException)
+                    {
+                        StatusTextBoxText = "Provided port is occupied";
+                        host.removeEndpoint();
+                    }
+                    catch (Exception ex)
+                    {
+                        StatusTextBoxText = ex.Message;
+                        host.removeEndpoint();
+                    }
+                } else
+                {
+                    StatusTextBoxText = "Provided invalid IP/Port";
+                }
             }
             else
             {
                 StatusTextBoxText = "Disrupting connection";
                 host.stopService();
+                userList.Clear();
                 StatusTextBoxText = "Offline";
                 IsOnline = false;
             }
@@ -197,6 +224,22 @@ namespace MessengerServer.ViewModels
             }
         }
 
+        private void UserAddedCallbackHandler(object sender, EventArgs e)
+        {
+            if (e!=null && e is User)
+            {
+                userList.Add((e as User).ToString());
+            }
+        }
+
+        private void UserRemovedCallbackHandler(object sender, EventArgs e)
+        {
+            if (e != null && e is User)
+            {
+                userList.Remove((e as User).ToString());
+            }
+        }
+
         private static string GetPublicIpAddress()
         {
             using (var webClient = new WebClient())
@@ -206,12 +249,66 @@ namespace MessengerServer.ViewModels
                     string response = webClient.DownloadString("https://api.ipify.org");
                     return response.Trim();
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Console.WriteLine("Error retrieving public IP address: " + ex.Message);
                     return null;
                 }
             }
+        }
+
+        private static string GetPrivateIpAddress()
+        {
+            NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+            foreach (NetworkInterface networkInterface in networkInterfaces)
+            {
+                if (networkInterface.OperationalStatus == OperationalStatus.Up && networkInterface.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                {
+                    IPInterfaceProperties ipProperties = networkInterface.GetIPProperties();
+                    foreach (UnicastIPAddressInformation ipAddress in ipProperties.UnicastAddresses)
+                    {
+                        if (ipAddress.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                        {
+                            return ipAddress.Address.ToString();
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        public static bool IsValidIP(string ipAddress)
+        {
+            //Checking that string pattern is valid for IP:port
+            string pattern = @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}$";
+            if (!Regex.IsMatch(ipAddress, pattern)) {
+                return false;
+            }
+
+            //Checking that : splits string in ip and port, if port is parsing to int and if it in range 1..65535 
+            int port;
+            string[] parts = ipAddress.Split(':');
+            if (parts.Length != 2 || !int.TryParse(parts[1], out port) || port<1 || port >65535)
+            {
+                return false;
+            }
+
+            //Checking that . splits ip in 4 parts
+            string[] octets = parts[0].Split('.');
+            if (octets.Length!=4)
+            {
+                return false;
+            }
+
+            //Checking if every part of IP is int in range 0..255
+            foreach (string ipPart in octets)
+            {
+                int parsedPart;
+                if (!int.TryParse(ipPart, out parsedPart) || parsedPart < 0 || parsedPart>255)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

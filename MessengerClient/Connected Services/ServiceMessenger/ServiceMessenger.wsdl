@@ -33,6 +33,7 @@
     <xsd:schema targetNamespace="http://tempuri.org/Imports">
       <xsd:import schemaLocation="http://localhost:8301/?xsd=xsd0" namespace="http://tempuri.org/" />
       <xsd:import schemaLocation="http://localhost:8301/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:8301/?xsd=xsd2" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
     </xsd:schema>
   </wsdl:types>
   <wsdl:message name="IServiceMessenger_Connect_InputMessage">
@@ -47,8 +48,20 @@
   <wsdl:message name="IServiceMessenger_Disconnect_OutputMessage">
     <wsdl:part name="parameters" element="tns:DisconnectResponse" />
   </wsdl:message>
+  <wsdl:message name="IServiceMessenger_GetUsersList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetUsersList" />
+  </wsdl:message>
+  <wsdl:message name="IServiceMessenger_GetUsersList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetUsersListResponse" />
+  </wsdl:message>
   <wsdl:message name="IServiceMessenger_SendMessage_InputMessage">
     <wsdl:part name="parameters" element="tns:SendMessage" />
+  </wsdl:message>
+  <wsdl:message name="IServiceMessenger_ChatMemberLeftCallback_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:ChatMemberLeftCallback" />
+  </wsdl:message>
+  <wsdl:message name="IServiceMessenger_ChatMemberJoinedCallback_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:ChatMemberJoinedCallback" />
   </wsdl:message>
   <wsdl:message name="IServiceMessenger_MessageCallback_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:MessageCallback" />
@@ -62,8 +75,18 @@
       <wsdl:input wsaw:Action="http://tempuri.org/IServiceMessenger/Disconnect" message="tns:IServiceMessenger_Disconnect_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IServiceMessenger/DisconnectResponse" message="tns:IServiceMessenger_Disconnect_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetUsersList">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServiceMessenger/GetUsersList" message="tns:IServiceMessenger_GetUsersList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServiceMessenger/GetUsersListResponse" message="tns:IServiceMessenger_GetUsersList_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="SendMessage">
       <wsdl:input wsaw:Action="http://tempuri.org/IServiceMessenger/SendMessage" message="tns:IServiceMessenger_SendMessage_InputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ChatMemberLeftCallback">
+      <wsdl:output wsaw:Action="http://tempuri.org/IServiceMessenger/ChatMemberLeftCallback" message="tns:IServiceMessenger_ChatMemberLeftCallback_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ChatMemberJoinedCallback">
+      <wsdl:output wsaw:Action="http://tempuri.org/IServiceMessenger/ChatMemberJoinedCallback" message="tns:IServiceMessenger_ChatMemberJoinedCallback_OutputCallbackMessage" />
     </wsdl:operation>
     <wsdl:operation name="MessageCallback">
       <wsdl:output wsaw:Action="http://tempuri.org/IServiceMessenger/MessageCallback" message="tns:IServiceMessenger_MessageCallback_OutputCallbackMessage" />
@@ -90,11 +113,32 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetUsersList">
+      <soap12:operation soapAction="http://tempuri.org/IServiceMessenger/GetUsersList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="SendMessage">
       <soap12:operation soapAction="http://tempuri.org/IServiceMessenger/SendMessage" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="ChatMemberLeftCallback">
+      <soap12:operation soapAction="http://tempuri.org/IServiceMessenger/ChatMemberLeftCallback" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChatMemberJoinedCallback">
+      <soap12:operation soapAction="http://tempuri.org/IServiceMessenger/ChatMemberJoinedCallback" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="MessageCallback">
       <soap12:operation soapAction="http://tempuri.org/IServiceMessenger/MessageCallback" style="document" />
@@ -105,9 +149,9 @@
   </wsdl:binding>
   <wsdl:service name="ServiceMessenger">
     <wsdl:port name="NetTcpBinding_IServiceMessenger" binding="tns:NetTcpBinding_IServiceMessenger">
-      <soap12:address location="net.tcp://localhost:8302/" />
+      <soap12:address location="net.tcp://192.168.0.140:7602/" />
       <wsa10:EndpointReference>
-        <wsa10:Address>net.tcp://localhost:8302/</wsa10:Address>
+        <wsa10:Address>net.tcp://192.168.0.140:7602/</wsa10:Address>
         <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
           <Upn>DESKTOP-BTRBT9G\Антон</Upn>
         </Identity>

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.ServiceModel;
+using System.ServiceModel.Description;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,20 +17,24 @@ namespace MessengerServer
 
         public void startService(string url)
         {
-            Uri hostAddress = new Uri($"net.tcp://{url}/ServiceMessenger");
-            Host = new ServiceHost(Messenger, hostAddress);
-            Host.AddServiceEndpoint(typeof(MessengerService.IServiceMessenger), new NetTcpBinding(), "");
-            try
-            {
-                Host.Open();
-            } catch (Exception ex)
-            {
-            }
+            Uri hostAddress = new Uri($"net.tcp://{url}");
+            Host = new ServiceHost(Messenger);
+            Host.AddServiceEndpoint(typeof(MessengerService.IServiceMessenger), new NetTcpBinding(), hostAddress);
+            Host.Open();
         }
 
         public void stopService()
         {
             Host.Close();
+        }
+
+        public void removeEndpoint()
+        {
+            ServiceEndpoint endpointToRemove = Host.Description.Endpoints.FirstOrDefault();
+            if (endpointToRemove!= null)
+            {
+                Host.Description.Endpoints.Remove(endpointToRemove);
+            }
         }
     }
 }

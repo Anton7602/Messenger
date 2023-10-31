@@ -27,6 +27,12 @@ namespace MessengerClient.ServiceMessenger {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IServiceMessenger/Disconnect", ReplyAction="http://tempuri.org/IServiceMessenger/DisconnectResponse")]
         System.Threading.Tasks.Task DisconnectAsync(int id);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IServiceMessenger/GetUsersList", ReplyAction="http://tempuri.org/IServiceMessenger/GetUsersListResponse")]
+        string[] GetUsersList();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IServiceMessenger/GetUsersList", ReplyAction="http://tempuri.org/IServiceMessenger/GetUsersListResponse")]
+        System.Threading.Tasks.Task<string[]> GetUsersListAsync();
+        
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IServiceMessenger/SendMessage")]
         void SendMessage(string message, int id);
         
@@ -36,6 +42,12 @@ namespace MessengerClient.ServiceMessenger {
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public interface IServiceMessengerCallback {
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IServiceMessenger/ChatMemberLeftCallback")]
+        void ChatMemberLeftCallback(string chatMember);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IServiceMessenger/ChatMemberJoinedCallback")]
+        void ChatMemberJoinedCallback(string chatMember);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IServiceMessenger/MessageCallback")]
         void MessageCallback(string message);
@@ -83,6 +95,14 @@ namespace MessengerClient.ServiceMessenger {
         
         public System.Threading.Tasks.Task DisconnectAsync(int id) {
             return base.Channel.DisconnectAsync(id);
+        }
+        
+        public string[] GetUsersList() {
+            return base.Channel.GetUsersList();
+        }
+        
+        public System.Threading.Tasks.Task<string[]> GetUsersListAsync() {
+            return base.Channel.GetUsersListAsync();
         }
         
         public void SendMessage(string message, int id) {
