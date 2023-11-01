@@ -26,7 +26,9 @@ namespace MessengerServer
         {
             Uri hostAddress = new Uri($"net.tcp://{url}");
             Host = new ServiceHost(Messenger);
-            Host.AddServiceEndpoint(typeof(MessengerService.IServiceMessenger), new NetTcpBinding(), hostAddress);
+            NetTcpBinding binding = new NetTcpBinding();
+            binding.Security.Mode = SecurityMode.None;
+            Host.AddServiceEndpoint(typeof(MessengerService.IServiceMessenger), binding, hostAddress);
             Host.Open();
         }
 
