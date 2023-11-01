@@ -1,4 +1,5 @@
 # WCF Client-Server Messenger App
+# Try Connecting to 188.134.90.28:7602 - Chanses are I'm holding open chatroom there )
 
 This is a client-server messenger application built using WCF (Windows Communication Foundation). The application allows users to exchange messages in real-time over a direct IP:Port connection. The server-side is developed using C# WPF, while the client-side is developed using C# DevExpress. Both sides follow the MVVM (Model-View-ViewModel) pattern to separate concerns and maintain a clean architecture.
 
