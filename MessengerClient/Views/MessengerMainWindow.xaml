@@ -11,6 +11,7 @@
     xmlns:vm="clr-namespace:MessengerClient.ViewModels"
     xmlns:v="clr-namespace:MessengerClient.Views"
     xmlns:m="clr-namespace:MessengerClient.Models"
+    Icon="..\Resourses\client.ico"
     Title="Messenger Client" Height="800" Width="1000" MinHeight="400" MinWidth="500">
     <dx:ThemedWindow.DataContext>
         <vm:MainWindowViewModel/>
@@ -28,7 +29,7 @@
                 <dxlc:FlowLayoutControl Orientation="Horizontal" Padding="0" VerticalAlignment="Top">
                     <!--Ip:Port UI-->
                     <dxlc:FlowLayoutControl Orientation="Horizontal" Padding="0" VerticalAlignment="Top" Margin="0 0 30 0">
-                        <dx:SimpleButton Height="25" Margin="0 0 30 0" BorderThickness="0" ButtonKind="Toggle" IsChecked="{Binding IsOnline, Mode=OneWay}" Command="{Binding connectionCommand}" CommandParameter="{Binding CurrentURL}">
+                        <dx:SimpleButton Height="25" Margin="0 0 30 0" BorderThickness="0" ButtonKind="Toggle" IsChecked="{Binding IsOnline, Mode=OneWay}" Command="{Binding connectionCommand}" CommandParameter="{Binding CurrentURL}" Cursor="Hand">
                             <dx:SimpleButton.Style>
                                 <Style TargetType="dx:SimpleButton">
                                     <Setter Property="Glyph" Value="..\Resourses\connect.png">
@@ -105,7 +106,7 @@
                 <!--Message input TextBox-->
                 <dxe:ButtonEdit Name="MessageTextBox" EditValue="{Binding InputMessage, UpdateSourceTrigger=PropertyChanged}" AllowDefaultButton="False" TextWrapping="Wrap" VerticalContentAlignment="Top">
                     <dxe:ButtonEdit.Buttons>
-                        <dxe:ButtonInfo Command="{Binding sendMessage}" CommandParameter="{Binding InputMessage}" GlyphKind="User">
+                        <dxe:ButtonInfo Command="{Binding sendMessage}" CommandParameter="{Binding InputMessage}" GlyphKind="User" Cursor="Hand">
                             <dxe:ButtonInfo.ContentTemplate>
                                 <DataTemplate>
                                     <dx:DXImage Height="30" Source="..\Resourses\send.png"/>

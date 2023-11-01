@@ -16,7 +16,7 @@ namespace MessengerService
         [OperationContract]
         void Disconnect(int id);
         [OperationContract]
-        List<string> GetUsersList();
+        List<string> GetUsersNamesList();
 
         [OperationContract(IsOneWay = true)]
         void SendMessage(string message, int id);
@@ -34,5 +34,8 @@ namespace MessengerService
 
         [OperationContract(IsOneWay = true)]
         void MessageCallback(string message);
+
+        [OperationContract(IsOneWay = true)]
+        void PingCallback();
     }
 }

@@ -7,6 +7,8 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Security.Principal;
 using System.ServiceModel;
+using System.Threading;
+using System.Windows;
 using System.Windows.Input;
 
 namespace MessengerClient.ViewModels
@@ -14,6 +16,8 @@ namespace MessengerClient.ViewModels
     internal class MainWindowViewModel : ViewModelBase, IServiceMessengerCallback
     {
         #region Fields and Properties
+        private int durationBetweenPings = 1; //minutes
+        private Timer serverPingTimer;
         private int ID;
         ServiceMessenger.ServiceMessengerClient client;
 
@@ -149,7 +153,7 @@ namespace MessengerClient.ViewModels
         public MainWindowViewModel()
         {
             //Attempt to prefill proper IP
-            string relevantIP = GetPublicIpAddress();
+            string relevantIP = GetPrivateIpAddress();
             string[] elementsOfIp = relevantIP.Split('.');
             if (elementsOfIp.Length == 4)
             {
@@ -184,10 +188,11 @@ namespace MessengerClient.ViewModels
                     try
                     {
                         ID = client.Connect(UserNameTextBoxText);
+                        serverPingTimer = new Timer(serverPingCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(durationBetweenPings));
                         IsOnline = true;
                         StatusTextBoxText = "Connected";
                         UserList.Clear();
-                        foreach (var chatMember in client.GetUsersList())
+                        foreach (var chatMember in client.GetUsersNamesList())
                         {
                             _userList.Add(chatMember);
                         }
@@ -211,10 +216,40 @@ namespace MessengerClient.ViewModels
             if (IsOnline)
             {
                 StatusTextBoxText = "Disrupting connection";
-                client.Disconnect(ID);
+                if (serverPingTimer != null)
+                {
+                    serverPingTimer.Dispose();
+                }
+                try
+                {
+                    client.Disconnect(ID);
+                    StatusTextBoxText = "Disconnected";
+                }
+                catch 
+                {
+                    StatusTextBoxText = "Disconnected with errors";
+                }
                 IsOnline = false;
                 UserList.Clear();
-                StatusTextBoxText = "Disconnected";
+            }
+        }
+
+        /// <summary>
+        /// Method triggers by serverPingTimer and calls the server to check if connection is still online
+        /// </summary>
+        private void serverPingCallback(object status)
+        {
+            try
+            {
+                client.GetUsersNamesList();
+            }
+            catch
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Disconnect();
+                    StatusTextBoxText = "Server stopped responding";
+                });
             }
         }
 
@@ -245,8 +280,17 @@ namespace MessengerClient.ViewModels
                 string text = message.ToString();
                 if (!text.Equals(String.Empty))
                 {
-                    client.SendMessage(text, ID);
-                    InputMessage = String.Empty;
+                    try
+                    {
+                        client.SendMessage(text, ID);
+                        InputMessage = String.Empty;
+
+                    }
+                    catch
+                    {
+                        Disconnect();
+                        StatusTextBoxText = "Failed to send message";
+                    }
                 }
             }
         }
@@ -388,9 +432,15 @@ namespace MessengerClient.ViewModels
         /// </summary>
         public void ServerShutDownCallback()
         {
-            IsOnline = false;
-            UserList.Clear();
-            StatusTextBoxText = "Disconnected";
+            Disconnect();
+            StatusTextBoxText = "Server went offline";
+        }
+
+        /// <summary>
+        /// IServiceMessengerCallback that triggers when server pings this client
+        /// </summary>
+        public void PingCallback()
+        {
         }
         #endregion
     }

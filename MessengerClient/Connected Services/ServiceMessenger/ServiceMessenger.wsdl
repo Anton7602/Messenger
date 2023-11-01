@@ -4,27 +4,6 @@
     <wsp:ExactlyOne>
       <wsp:All>
         <msb:BinaryEncoding xmlns:msb="http://schemas.microsoft.com/ws/06/2004/mspolicy/netbinary1" />
-        <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-          <wsp:Policy>
-            <sp:TransportToken>
-              <wsp:Policy>
-                <msf:WindowsTransportSecurity xmlns:msf="http://schemas.microsoft.com/ws/2006/05/framing/policy">
-                  <msf:ProtectionLevel>EncryptAndSign</msf:ProtectionLevel>
-                </msf:WindowsTransportSecurity>
-              </wsp:Policy>
-            </sp:TransportToken>
-            <sp:AlgorithmSuite>
-              <wsp:Policy>
-                <sp:Basic256 />
-              </wsp:Policy>
-            </sp:AlgorithmSuite>
-            <sp:Layout>
-              <wsp:Policy>
-                <sp:Strict />
-              </wsp:Policy>
-            </sp:Layout>
-          </wsp:Policy>
-        </sp:TransportBinding>
         <wsaw:UsingAddressing />
       </wsp:All>
     </wsp:ExactlyOne>
@@ -48,11 +27,11 @@
   <wsdl:message name="IServiceMessenger_Disconnect_OutputMessage">
     <wsdl:part name="parameters" element="tns:DisconnectResponse" />
   </wsdl:message>
-  <wsdl:message name="IServiceMessenger_GetUsersList_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetUsersList" />
+  <wsdl:message name="IServiceMessenger_GetUsersNamesList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetUsersNamesList" />
   </wsdl:message>
-  <wsdl:message name="IServiceMessenger_GetUsersList_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetUsersListResponse" />
+  <wsdl:message name="IServiceMessenger_GetUsersNamesList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetUsersNamesListResponse" />
   </wsdl:message>
   <wsdl:message name="IServiceMessenger_SendMessage_InputMessage">
     <wsdl:part name="parameters" element="tns:SendMessage" />
@@ -69,6 +48,9 @@
   <wsdl:message name="IServiceMessenger_MessageCallback_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:MessageCallback" />
   </wsdl:message>
+  <wsdl:message name="IServiceMessenger_PingCallback_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:PingCallback" />
+  </wsdl:message>
   <wsdl:portType name="IServiceMessenger">
     <wsdl:operation name="Connect">
       <wsdl:input wsaw:Action="http://tempuri.org/IServiceMessenger/Connect" message="tns:IServiceMessenger_Connect_InputMessage" />
@@ -78,9 +60,9 @@
       <wsdl:input wsaw:Action="http://tempuri.org/IServiceMessenger/Disconnect" message="tns:IServiceMessenger_Disconnect_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IServiceMessenger/DisconnectResponse" message="tns:IServiceMessenger_Disconnect_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GetUsersList">
-      <wsdl:input wsaw:Action="http://tempuri.org/IServiceMessenger/GetUsersList" message="tns:IServiceMessenger_GetUsersList_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/IServiceMessenger/GetUsersListResponse" message="tns:IServiceMessenger_GetUsersList_OutputMessage" />
+    <wsdl:operation name="GetUsersNamesList">
+      <wsdl:input wsaw:Action="http://tempuri.org/IServiceMessenger/GetUsersNamesList" message="tns:IServiceMessenger_GetUsersNamesList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IServiceMessenger/GetUsersNamesListResponse" message="tns:IServiceMessenger_GetUsersNamesList_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="SendMessage">
       <wsdl:input wsaw:Action="http://tempuri.org/IServiceMessenger/SendMessage" message="tns:IServiceMessenger_SendMessage_InputMessage" />
@@ -96,6 +78,9 @@
     </wsdl:operation>
     <wsdl:operation name="MessageCallback">
       <wsdl:output wsaw:Action="http://tempuri.org/IServiceMessenger/MessageCallback" message="tns:IServiceMessenger_MessageCallback_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="PingCallback">
+      <wsdl:output wsaw:Action="http://tempuri.org/IServiceMessenger/PingCallback" message="tns:IServiceMessenger_PingCallback_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="NetTcpBinding_IServiceMessenger" type="tns:IServiceMessenger">
@@ -119,8 +104,8 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="GetUsersList">
-      <soap12:operation soapAction="http://tempuri.org/IServiceMessenger/GetUsersList" style="document" />
+    <wsdl:operation name="GetUsersNamesList">
+      <soap12:operation soapAction="http://tempuri.org/IServiceMessenger/GetUsersNamesList" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -158,15 +143,18 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="PingCallback">
+      <soap12:operation soapAction="http://tempuri.org/IServiceMessenger/PingCallback" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="ServiceMessenger">
     <wsdl:port name="NetTcpBinding_IServiceMessenger" binding="tns:NetTcpBinding_IServiceMessenger">
       <soap12:address location="net.tcp://192.168.0.140:7602/" />
       <wsa10:EndpointReference>
         <wsa10:Address>net.tcp://192.168.0.140:7602/</wsa10:Address>
-        <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
-          <Upn>DESKTOP-BTRBT9G\Антон</Upn>
-        </Identity>
       </wsa10:EndpointReference>
     </wsdl:port>
   </wsdl:service>

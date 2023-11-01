@@ -8,6 +8,8 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Windows;
 using System.Windows.Input;
 
 namespace MessengerServer.ViewModels
@@ -16,6 +18,8 @@ namespace MessengerServer.ViewModels
     {
         #region Fields and Properties
         private readonly MessengerServiceHost Host = new MessengerServiceHost();
+        private int durationBetweenPings = 1; // Minutes
+        private Timer pingTimer;
 
         private ObservableCollection<string> _userList = new ObservableCollection<string>();
         public ObservableCollection<string> UserList 
@@ -176,6 +180,7 @@ namespace MessengerServer.ViewModels
                     try
                     {
                         Host.startService(url as string);
+                        pingTimer = new Timer(pingTimerCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(durationBetweenPings));
                         StatusTextBoxText = "Online";
                         IsOnline = true;
                     }
@@ -203,11 +208,27 @@ namespace MessengerServer.ViewModels
         public void Disconnect()
         {
             StatusTextBoxText = "Disrupting connection";
+            if (pingTimer!=null)
+            {
+                pingTimer.Dispose();
+            }
             Host.Messenger.ServiceWrapUp();
             Host.stopService();
             _userList.Clear();
             StatusTextBoxText = "Offline";
             IsOnline = false;
+        }
+
+        /// <summary>
+        /// Method triggers by pingTimer and calls ping callback from all users to check if everyone still connected
+        /// </summary>
+        /// <param name="state"></param>
+        private void pingTimerCallback(object state)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Host.Messenger.pingUsers(Host.Messenger.GetUsersList());
+            });
         }
 
         /// <summary>

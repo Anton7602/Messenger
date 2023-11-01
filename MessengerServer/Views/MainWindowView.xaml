@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:MessengerServer.Views"
         xmlns:vm="clr-namespace:MessengerServer.ViewModels"
         mc:Ignorable="d"
+        Icon="..\Resourses\server.ico"
         Title="Messenger Server" Height="450" Width="800">
     <Window.DataContext>
         <vm:MainWindowViewModel/>
@@ -36,7 +37,8 @@
                                 <ColumnDefinition Width="5*" />
                             </Grid.ColumnDefinitions>
 
-                            <ToggleButton Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Command="{Binding connectionCommand}" CommandParameter="{Binding CurrentURL}" IsChecked="{Binding IsOnline, Mode=OneWay}" Background="White"  Margin="4" BorderThickness="0">
+                            <ToggleButton Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Command="{Binding connectionCommand}" CommandParameter="{Binding CurrentURL}" IsChecked="{Binding IsOnline, Mode=OneWay}" 
+                                          Background="White"  Margin="4" BorderThickness="0" Cursor="Hand">
                                 <ToggleButton.Style>
                                     <Style TargetType="ToggleButton">
                                         <Setter Property="Content">
@@ -114,7 +116,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" Text="{Binding InputMessage, UpdateSourceTrigger=PropertyChanged}"/>
                 <Button Grid.Column="1" Background="White" Margin="15" BorderThickness="0" Command="{Binding sendMessage}" CommandParameter="{Binding InputMessage}">
-                    <Image MaxHeight="60" MaxWidth="60" Source="..\Resourses\send.png"/>
+                    <Image MaxHeight="60" MaxWidth="60" Source="..\Resourses\send.png" Cursor="Hand"/>
                 </Button>
             </Grid>
         </Grid>

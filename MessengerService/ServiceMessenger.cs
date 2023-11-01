@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -38,6 +39,23 @@ namespace MessengerService
             NotifyClientsAboutEvent(MessengerEvent.ChatMemberJoined, user);
             userList.Add(user);
             return user.ID;
+        }
+
+        public void pingUsers(List<User> usersToPing)
+        {
+            List<User> unresponsiveUsers = new List<User>();
+            foreach(User client in usersToPing)
+            {
+                try
+                {
+                    client.UserOperationContext.GetCallbackChannel<IServerMessengerCallback>().PingCallback();
+                }
+                catch
+                {
+                    unresponsiveUsers.Add(client);
+                }
+            }
+            DisconnectUnresponsiveUsers(unresponsiveUsers);
         }
 
         /// <summary>
@@ -113,20 +131,6 @@ namespace MessengerService
         }
 
         /// <summary>
-        /// Return users list
-        /// </summary>
-        /// <returns></returns>
-        public List<string> GetUsersList()
-        {
-            List<string> list = new List<string>();
-            foreach(User user in userList)
-            {
-                list.Add(user.ToString());
-            }
-            return list;
-        }
-
-        /// <summary>
         /// Goes through Users List and triggers proper callback depending on event
         /// </summary>
         /// <param name="notificationEvent">Messanger Event</param>
@@ -159,6 +163,29 @@ namespace MessengerService
                 }
             }
             DisconnectUnresponsiveUsers(unresponsiveUsers);
+        }
+
+        /// <summary>
+        /// Return users list
+        /// </summary>
+        /// <returns>List of users names</returns>
+        public List<string> GetUsersNamesList()
+        {
+            List<string> list = new List<string>();
+            foreach (User user in userList)
+            {
+                list.Add(user.ToString());
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Return users list
+        /// </summary>
+        /// <returns>List of User objects</returns>
+        public List<User> GetUsersList()
+        {
+            return userList;
         }
     }
 }

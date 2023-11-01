@@ -27,11 +27,11 @@ namespace MessengerClient.ServiceMessenger {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IServiceMessenger/Disconnect", ReplyAction="http://tempuri.org/IServiceMessenger/DisconnectResponse")]
         System.Threading.Tasks.Task DisconnectAsync(int id);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IServiceMessenger/GetUsersList", ReplyAction="http://tempuri.org/IServiceMessenger/GetUsersListResponse")]
-        string[] GetUsersList();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IServiceMessenger/GetUsersNamesList", ReplyAction="http://tempuri.org/IServiceMessenger/GetUsersNamesListResponse")]
+        string[] GetUsersNamesList();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IServiceMessenger/GetUsersList", ReplyAction="http://tempuri.org/IServiceMessenger/GetUsersListResponse")]
-        System.Threading.Tasks.Task<string[]> GetUsersListAsync();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IServiceMessenger/GetUsersNamesList", ReplyAction="http://tempuri.org/IServiceMessenger/GetUsersNamesListResponse")]
+        System.Threading.Tasks.Task<string[]> GetUsersNamesListAsync();
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IServiceMessenger/SendMessage")]
         void SendMessage(string message, int id);
@@ -54,6 +54,9 @@ namespace MessengerClient.ServiceMessenger {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IServiceMessenger/MessageCallback")]
         void MessageCallback(string message);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IServiceMessenger/PingCallback")]
+        void PingCallback();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -100,12 +103,12 @@ namespace MessengerClient.ServiceMessenger {
             return base.Channel.DisconnectAsync(id);
         }
         
-        public string[] GetUsersList() {
-            return base.Channel.GetUsersList();
+        public string[] GetUsersNamesList() {
+            return base.Channel.GetUsersNamesList();
         }
         
-        public System.Threading.Tasks.Task<string[]> GetUsersListAsync() {
-            return base.Channel.GetUsersListAsync();
+        public System.Threading.Tasks.Task<string[]> GetUsersNamesListAsync() {
+            return base.Channel.GetUsersNamesListAsync();
         }
         
         public void SendMessage(string message, int id) {
