@@ -1,14 +1,19 @@
-﻿using MessengerClient.ServiceMessenger;
+﻿using DevExpress.Data;
+using MessengerClient.ServiceMessenger;
 using System;
+using System.Windows;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Security.Policy;
 using System.Security.RightsManagement;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using DevExpress.Data;
+using MessengerClient.Models;
 
 namespace MessengerClient.ViewModels
 {
@@ -72,7 +77,7 @@ namespace MessengerClient.ViewModels
             }
         }
 
-        private int _ipAddressTextBoxTextForth = 140;
+        private int _ipAddressTextBoxTextForth = 0;
         public int IpAddressTextBoxTextForth
         {
             get { return _ipAddressTextBoxTextForth; }
@@ -145,6 +150,16 @@ namespace MessengerClient.ViewModels
 
         public MainWindowViewModel()
         {
+            string relevantIP = GetPrivateIpAddress();
+            string[] elementsOfIp = relevantIP.Split('.');
+            if (elementsOfIp.Length == 4)
+            {
+                IpAddressTextBoxTextFirst = int.Parse(elementsOfIp[0]);
+                IpAddressTextBoxTextSecond = int.Parse(elementsOfIp[1]);
+                IpAddressTextBoxTextThird = int.Parse(elementsOfIp[2]);
+                IpAddressTextBoxTextForth = int.Parse(elementsOfIp[3]);
+            }
+
             connectionCommand = new RelayCommand<object>(HandleConnection);
             sendMessage = new RelayCommand<object>(SendMessage);
         }
@@ -153,6 +168,7 @@ namespace MessengerClient.ViewModels
         {
             if (!IsOnline)
             {
+                StatusTextBoxText = "Establishing connection";
                 client = new ServiceMessengerClient(new System.ServiceModel.InstanceContext(this));
                 Uri connectAddress = new Uri($"net.tcp://{url}");
                 client.Endpoint.Address = new System.ServiceModel.EndpointAddress(connectAddress);
@@ -184,6 +200,7 @@ namespace MessengerClient.ViewModels
         {
             if (IsOnline)
             {
+                StatusTextBoxText = "Disrupting connection";
                 client.Disconnect(ID);
                 IsOnline = false;
                 UserList.Clear();
@@ -238,6 +255,26 @@ namespace MessengerClient.ViewModels
             }
         }
 
+        private static string GetPrivateIpAddress()
+        {
+            NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+            foreach (NetworkInterface networkInterface in networkInterfaces)
+            {
+                if (networkInterface.OperationalStatus == OperationalStatus.Up && networkInterface.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                {
+                    IPInterfaceProperties ipProperties = networkInterface.GetIPProperties();
+                    foreach (UnicastIPAddressInformation ipAddress in ipProperties.UnicastAddresses)
+                    {
+                        if (ipAddress.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                        {
+                            return ipAddress.Address.ToString();
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
         public void MessageCallback(string message)
         {
             if (message!=null)
@@ -260,6 +297,13 @@ namespace MessengerClient.ViewModels
             {
                 UserList.Add(chatMember);
             }
+        }
+
+        public void ServerShutDownCallback()
+        {
+            IsOnline = false;
+            UserList.Clear();
+            StatusTextBoxText = "Disconnected";
         }
     }
 }

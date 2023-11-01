@@ -12,7 +12,7 @@ namespace MessengerService
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class ServiceMessenger : IServiceMessenger
     {
-        private enum MessengerEvent { MessageSent, ChatMemberJoined, ChatMemberLeft }
+        private enum MessengerEvent { MessageSent, ChatMemberJoined, ChatMemberLeft, ServerShutDown }
         public List<User> userList = new List<User>();
         public event EventHandler<Message> ServerMessageCallback;
         public event EventHandler<User> ServerUserAddedCallback;
@@ -47,6 +47,15 @@ namespace MessengerService
             }
         }
 
+        public void DisconnectAllClients()
+        {
+            List<User> tempUsers = new List<User>(userList);
+            foreach (var user in tempUsers)
+            {
+                Disconnect(user.ID);
+            }
+        }
+
         public void SendMessage(string messageText, int id)
         {
             var sender = userList.FirstOrDefault(x => x.ID == id);
@@ -61,6 +70,12 @@ namespace MessengerService
             Message message = new Message(senderName, DateTime.Now, messageText);
             ServerMessageCallback?.Invoke(this, message);
             NotifyClientsAboutEvent(MessengerEvent.MessageSent, message);
+        }
+
+        public void ServiceWrapUp()
+        {
+            NotifyClientsAboutEvent(MessengerEvent.ServerShutDown, String.Empty);
+            DisconnectAllClients();
         }
 
         public List<string> GetUsersList()
@@ -99,6 +114,9 @@ namespace MessengerService
                             break;
                         case (MessengerEvent.ChatMemberLeft):
                             client.UserOperationContext.GetCallbackChannel<IServerMessengerCallback>().ChatMemberLeftCallback(parameter.ToString());
+                            break;
+                        case (MessengerEvent.ServerShutDown):
+                            client.UserOperationContext.GetCallbackChannel<IServerMessengerCallback>().ServerShutDownCallback();
                             break;
                     }
                 }

@@ -43,6 +43,9 @@ namespace MessengerClient.ServiceMessenger {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public interface IServiceMessengerCallback {
         
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IServiceMessenger/ServerShutDownCallback")]
+        void ServerShutDownCallback();
+        
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IServiceMessenger/ChatMemberLeftCallback")]
         void ChatMemberLeftCallback(string chatMember);
         

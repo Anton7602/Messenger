@@ -57,6 +57,9 @@
   <wsdl:message name="IServiceMessenger_SendMessage_InputMessage">
     <wsdl:part name="parameters" element="tns:SendMessage" />
   </wsdl:message>
+  <wsdl:message name="IServiceMessenger_ServerShutDownCallback_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:ServerShutDownCallback" />
+  </wsdl:message>
   <wsdl:message name="IServiceMessenger_ChatMemberLeftCallback_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:ChatMemberLeftCallback" />
   </wsdl:message>
@@ -81,6 +84,9 @@
     </wsdl:operation>
     <wsdl:operation name="SendMessage">
       <wsdl:input wsaw:Action="http://tempuri.org/IServiceMessenger/SendMessage" message="tns:IServiceMessenger_SendMessage_InputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ServerShutDownCallback">
+      <wsdl:output wsaw:Action="http://tempuri.org/IServiceMessenger/ServerShutDownCallback" message="tns:IServiceMessenger_ServerShutDownCallback_OutputCallbackMessage" />
     </wsdl:operation>
     <wsdl:operation name="ChatMemberLeftCallback">
       <wsdl:output wsaw:Action="http://tempuri.org/IServiceMessenger/ChatMemberLeftCallback" message="tns:IServiceMessenger_ChatMemberLeftCallback_OutputCallbackMessage" />
@@ -127,6 +133,12 @@
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="ServerShutDownCallback">
+      <soap12:operation soapAction="http://tempuri.org/IServiceMessenger/ServerShutDownCallback" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="ChatMemberLeftCallback">
       <soap12:operation soapAction="http://tempuri.org/IServiceMessenger/ChatMemberLeftCallback" style="document" />

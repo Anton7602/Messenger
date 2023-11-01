@@ -195,6 +195,7 @@ namespace MessengerServer.ViewModels
         public void Disconnect()
         {
             StatusTextBoxText = "Disrupting connection";
+            host.Messenger.ServiceWrapUp();
             host.stopService();
             userList.Clear();
             StatusTextBoxText = "Offline";

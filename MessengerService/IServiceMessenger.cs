@@ -25,6 +25,8 @@ namespace MessengerService
     public interface IServerMessengerCallback
     {
         [OperationContract(IsOneWay = true)]
+        void ServerShutDownCallback();
+        [OperationContract(IsOneWay = true)]
         void ChatMemberLeftCallback(string chatMember);
 
         [OperationContract(IsOneWay = true)]
