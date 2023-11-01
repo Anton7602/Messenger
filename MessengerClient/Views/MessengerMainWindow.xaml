@@ -67,7 +67,7 @@
                     <!--Status UI-->
                     <dxlc:FlowLayoutControl  Orientation="Horizontal" Padding="0">
                         <dx:DXImage Source="..\Resourses\status.png" Height="20" Margin="5 2"/>
-                        <dxe:TextEdit Name="StatusTextBox" EditValue="{Binding StatusTextBoxText, UpdateSourceTrigger=PropertyChanged}" Width="200" IsEnabled="False" CausesValidation="True" Validate="Status_Decorate"/>
+                        <dxe:TextEdit Name="StatusTextBox" TextWrapping="Wrap" EditValue="{Binding StatusTextBoxText, UpdateSourceTrigger=PropertyChanged}" Width="200" IsEnabled="False" CausesValidation="True" Validate="Status_Decorate"/>
                     </dxlc:FlowLayoutControl>
 
                 </dxlc:FlowLayoutControl>

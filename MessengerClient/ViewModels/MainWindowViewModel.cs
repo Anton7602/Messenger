@@ -3,7 +3,9 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Net.NetworkInformation;
+using System.ServiceModel;
 using System.Windows.Input;
 
 namespace MessengerClient.ViewModels
@@ -146,7 +148,7 @@ namespace MessengerClient.ViewModels
         public MainWindowViewModel()
         {
             //Attempt to prefill proper IP
-            string relevantIP = GetPrivateIpAddress();
+            string relevantIP = GetPublicIpAddress();
             string[] elementsOfIp = relevantIP.Split('.');
             if (elementsOfIp.Length == 4)
             {
@@ -174,7 +176,8 @@ namespace MessengerClient.ViewModels
                 StatusTextBoxText = "Establishing connection";
                 client = new ServiceMessengerClient(new System.ServiceModel.InstanceContext(this));
                 Uri connectAddress = new Uri($"net.tcp://{url}");
-                client.Endpoint.Address = new System.ServiceModel.EndpointAddress(connectAddress);
+                EndpointIdentity identity = EndpointIdentity.CreateUpnIdentity("DESKTOP-BTRBT9G\\Антон");
+                client.Endpoint.Address = new System.ServiceModel.EndpointAddress(connectAddress, identity);
                 if (IsUsernameVaild(UserNameTextBoxText))
                 {
                     try
@@ -188,9 +191,9 @@ namespace MessengerClient.ViewModels
                             _userList.Add(chatMember);
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        StatusTextBoxText = "Connection failed";
+                        StatusTextBoxText = "Connection failed " + ex.Message;
                     }
                 } else
                 {
@@ -270,6 +273,26 @@ namespace MessengerClient.ViewModels
                 return false;
             }
             return true;
+        }
+
+        /// <summary>
+        /// Call internet API to get machine's public IP. Currently not used, but if hosted on static public IP might be used to show client connection string
+        /// </summary>
+        /// <returns>Public IP String. 5.15.122.150 For Example</returns>
+        private static string GetPublicIpAddress()
+        {
+            using (var webClient = new WebClient())
+            {
+                try
+                {
+                    string response = webClient.DownloadString("https://api.ipify.org");
+                    return response.Trim();
+                }
+                catch
+                {
+                    return null;
+                }
+            }
         }
 
         /// <summary>
