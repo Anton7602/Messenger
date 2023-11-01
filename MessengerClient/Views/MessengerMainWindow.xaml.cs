@@ -35,11 +35,18 @@ namespace MessengerClient.Views
         {
             InitializeComponent();
             RegisterApplication();
+            //Connecting views event with viewmodels handlers
             Closing += (DataContext as MainWindowViewModel).OnWindowClosing;
             KeyDown += (DataContext as MainWindowViewModel).OnKeyPressed;
+            //Subscribes to Messages collection updates to properly scroll MessagesHolder to the last position
             (DataContext as MainWindowViewModel).MessagesList.CollectionChanged += MessagesUpdated;
         }
 
+        /// <summary>
+        /// Username validation sender
+        /// </summary>
+        /// <param name="sender">EditText</param>
+        /// <param name="e">EditText Content</param>
         private void Username_Validate(object sender, DevExpress.Xpf.Editors.ValidationEventArgs e)
         {
             if (e.Value == null || e.Value.Equals(String.Empty))
@@ -68,6 +75,11 @@ namespace MessengerClient.Views
             return;
         }
 
+        /// <summary>
+        /// Listener for status changes that colors changeEditText border in the proper color
+        /// </summary>
+        /// <param name="sender">Status EditText</param>
+        /// <param name="e">Current visible status</param>
         private void Status_Decorate(object sender, DevExpress.Xpf.Editors.ValidationEventArgs e)
         {
             switch (e.Value)
@@ -84,6 +96,12 @@ namespace MessengerClient.Views
             }
         }
 
+
+        /// <summary>
+        /// Triggers on Messenges collection update and scrolls MessagesHolder to a last position
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MessagesUpdated(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (MessageHolder.VisibleItems.Count>1)
@@ -92,6 +110,8 @@ namespace MessengerClient.Views
             }
         }
 
+        // DevExpress Notification code.
+        #region DevExpress Notification
         public static void SendActivatorMessage(string arguments)
         {
             MessageBox.Show("Activator invoked! Notification id = " + arguments);
@@ -104,5 +124,6 @@ namespace MessengerClient.Views
                 ShellHelper.TryCreateShortcut(ApplicationID, ApplicationName, null, typeof(CustomNotificationActivator));
             }
         }
+        #endregion
     }
 }

@@ -78,6 +78,7 @@
                          dxlc:DockLayoutControl.AllowHorizontalSizing="True"
                          Width ="200"
                          Header="Active Chat Members:">
+                <!--ActiveMembers List-->
                 <dxg:TreeViewControl ItemsSource="{Binding UserList}"  
                              TreeViewFieldName="Name" HorizontalAlignment="Stretch">
                     <dxg:TreeViewControl.NodeContentDisplayTemplate>
@@ -93,7 +94,7 @@
 
             <dxlc:GroupBox dxlc:DockLayoutControl.Dock="Client" 
                          Header="Chat">
-
+                <!--MessagesHolder-->
                 <dxg:TreeViewControl Name="MessageHolder" ItemsSource="{Binding MessagesList}" TreeViewFieldName="Message"/>
 
             </dxlc:GroupBox>
@@ -101,6 +102,7 @@
             <dxlc:GroupBox dxlc:DockLayoutControl.Dock="Bottom"
                            dxlc:DockLayoutControl.AllowVerticalSizing="True"
                          Height ="90">
+                <!--Message input TextBox-->
                 <dxe:ButtonEdit Name="MessageTextBox" EditValue="{Binding InputMessage, UpdateSourceTrigger=PropertyChanged}" AllowDefaultButton="False" TextWrapping="Wrap" VerticalContentAlignment="Top">
                     <dxe:ButtonEdit.Buttons>
                         <dxe:ButtonInfo Command="{Binding sendMessage}" CommandParameter="{Binding InputMessage}" GlyphKind="User">

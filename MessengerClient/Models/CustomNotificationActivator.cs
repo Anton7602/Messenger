@@ -11,6 +11,9 @@ using System.Windows;
 
 namespace MessengerClient.Models
 {
+    /// <summary>
+    /// Notification activator for DevExpress Windows notifications
+    /// </summary>
     [Guid("5A430E6E-2E66-4A46-BBFA-A8CC432673A0"), ComVisible(true)]
     internal class CustomNotificationActivator : ToastNotificationActivator
     {

@@ -6,6 +6,9 @@ using System.Windows;
 
 namespace MessengerServer.ViewModels
 {
+    /// <summary>
+    /// Bool to visibility converter allows to change Views visibility parameter depending on binded ViewModel's variable state
+    /// </summary>
     [ValueConversion(typeof(bool), typeof(Visibility))]
     public sealed class BoolToVisibilityConverter : IValueConverter
     {

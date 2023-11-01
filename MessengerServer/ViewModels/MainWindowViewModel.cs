@@ -15,26 +15,26 @@ namespace MessengerServer.ViewModels
     internal class MainWindowViewModel : ViewModelBase
     {
         #region Fields and Properties
-        private MessengerServiceHost host = new MessengerServiceHost();
+        private readonly MessengerServiceHost Host = new MessengerServiceHost();
 
-        private ObservableCollection<string> userList = new ObservableCollection<string>();
+        private ObservableCollection<string> _userList = new ObservableCollection<string>();
         public ObservableCollection<string> UserList 
         { 
-            get { return userList; } 
+            get { return _userList; } 
             set
             {
-                userList = value;
-                OnPropertyChanged(nameof(userList));
+                _userList = value;
+                OnPropertyChanged(nameof(UserList));
             }
         }
 
-        private ObservableCollection<String> messagesList = new ObservableCollection<String>();
+        private ObservableCollection<String> _messagesList = new ObservableCollection<String>();
         public ObservableCollection<String> MessagesList
         {
-            get { return messagesList; }
+            get { return _messagesList; }
             set
             {
-                messagesList = value;
+                _messagesList = value;
                 OnPropertyChanged(nameof(MessagesList));
             }
         }
@@ -116,7 +116,7 @@ namespace MessengerServer.ViewModels
             }
         }
 
-        private string _inputMessage = "";
+        private string _inputMessage = String.Empty;
         public string InputMessage
         {
             get { return _inputMessage; }
@@ -132,9 +132,8 @@ namespace MessengerServer.ViewModels
         public RelayCommand<object> connectionCommand { get; private set; }
         public RelayCommand<object> sendMessage { get; private set; }
         #endregion
-        //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+        #region ViewModels Constructor
         public MainWindowViewModel()
         {
             using (var context = new MessageDbContext())
@@ -154,13 +153,19 @@ namespace MessengerServer.ViewModels
                 IpAddressTextBoxTextThird = int.Parse(elementsOfIp[2]);
                 IpAddressTextBoxTextForth = int.Parse(elementsOfIp[3]);
             }
-            host.Messenger.ServerUserAddedCallback += UserAddedCallbackHandler;
-            host.Messenger.ServerUserRemovedCallback += UserRemovedCallbackHandler;
-            host.Messenger.ServerMessageCallback += MessageCallbackHandler;
+            Host.Messenger.ServerUserAddedCallback += UserAddedCallbackHandler;
+            Host.Messenger.ServerUserRemovedCallback += UserRemovedCallbackHandler;
+            Host.Messenger.ServerMessageCallback += MessageCallbackHandler;
             connectionCommand = new RelayCommand<object>(HandleConnection);
             sendMessage = new RelayCommand<object>(SendMessage);
         }
+        #endregion
 
+        #region MessengerService
+        /// <summary>
+        /// Checks if url is valid and if is - tries to host MessengerService on it. Updates UI to online state
+        /// </summary>
+        /// <param name="url">IP:Port to host Service</param>
         public void Connect(string url)
         {
             if (!IsOnline)
@@ -170,19 +175,19 @@ namespace MessengerServer.ViewModels
                 {
                     try
                     {
-                        host.startService(url as string);
+                        Host.startService(url as string);
                         StatusTextBoxText = "Online";
                         IsOnline = true;
                     }
                     catch (System.ServiceModel.AddressAlreadyInUseException)
                     {
                         StatusTextBoxText = "Provided port is occupied";
-                        host.removeEndpoint();
+                        Host.removeEndpoint();
                     }
                     catch (Exception ex)
                     {
                         StatusTextBoxText = ex.Message;
-                        host.removeEndpoint();
+                        Host.removeEndpoint();
                     }
                 }
                 else
@@ -192,16 +197,23 @@ namespace MessengerServer.ViewModels
             }
         }
 
+        /// <summary>
+        /// Call Service shut down and updates UI to offline state
+        /// </summary>
         public void Disconnect()
         {
             StatusTextBoxText = "Disrupting connection";
-            host.Messenger.ServiceWrapUp();
-            host.stopService();
-            userList.Clear();
+            Host.Messenger.ServiceWrapUp();
+            Host.stopService();
+            _userList.Clear();
             StatusTextBoxText = "Offline";
             IsOnline = false;
         }
 
+        /// <summary>
+        /// Handler for connection ToggleButton command
+        /// </summary>
+        /// <param name="url">URL of Messenger Server</param>
         private void HandleConnection(object url)
         {
             if (!IsOnline)
@@ -214,6 +226,10 @@ namespace MessengerServer.ViewModels
             }
         }
 
+        /// <summary>
+        /// Method to invoke MessengerService SendMessage Method
+        /// </summary>
+        /// <param name="message">Text of message to send</param>
         private void SendMessage(object message)
         {
             if (IsOnline)
@@ -221,12 +237,19 @@ namespace MessengerServer.ViewModels
                 string text = message.ToString();
                 if (!text.Equals(String.Empty))
                 {
-                    host.Messenger.SendMessage(text, 0);
+                    Host.Messenger.SendMessage(text, 0);
                     InputMessage = String.Empty;
                 }
             }
         }
+        #endregion
 
+        #region Service Events Handlers
+        /// <summary>
+        /// Handles event when new message reaches the server. Saves recieved message to SQL Database
+        /// </summary>
+        /// <param name="sender">MessengerService</param>
+        /// <param name="e">Message object</param>
         private void MessageCallbackHandler(object sender, EventArgs e)
         {
             if (e!=null && e is Message)
@@ -240,27 +263,49 @@ namespace MessengerServer.ViewModels
             }
         }
 
+        /// <summary>
+        /// Handles event whan new client connects to the server
+        /// </summary>
+        /// <param name="sender">MessengerService</param>
+        /// <param name="e">User object</param>
         private void UserAddedCallbackHandler(object sender, EventArgs e)
         {
             if (e!=null && e is User)
             {
-                userList.Add((e as User).ToString());
+                _userList.Add((e as User).ToString());
             }
         }
 
+        /// <summary>
+        /// Handles event when client disconnects (properly) from the server
+        /// </summary>
+        /// <param name="sender">MessengerService</param>
+        /// <param name="e">User object</param>
         private void UserRemovedCallbackHandler(object sender, EventArgs e)
         {
             if (e != null && e is User)
             {
-                userList.Remove((e as User).ToString());
+                _userList.Remove((e as User).ToString());
             }
         }
+        #endregion
 
+        #region Views Events Handlers
+        /// <summary>
+        /// Event handler for Messenger Window closing
+        /// </summary>
+        /// <param name="sender">Messenger Window</param>
+        /// <param name="e">Empty EventArgs</param>
         public void OnWindowClosing(object sender, EventArgs e)
         {
             Disconnect();
         }
 
+        /// <summary>
+        /// Event handler for key pressed in Messenger Window
+        /// </summary>
+        /// <param name="sender">Messenger Window</param>
+        /// <param name="e">Empty EventArgs</param>
         public void OnKeyPressed(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -268,7 +313,13 @@ namespace MessengerServer.ViewModels
                 SendMessage(InputMessage);
             }
         }
+        #endregion
 
+        #region IP Helpers Methods
+        /// <summary>
+        /// Call internet API to get machine's public IP. Currently not used, but if hosted on static public IP might be used to show client connection string
+        /// </summary>
+        /// <returns>Public IP String. 5.15.122.150 For Example</returns>
         private static string GetPublicIpAddress()
         {
             using (var webClient = new WebClient())
@@ -284,7 +335,10 @@ namespace MessengerServer.ViewModels
                 }
             }
         }
-
+        /// <summary>
+        /// Tries to get machine's private IP to prefill IP TextBoxes
+        /// </summary>
+        /// <returns>Private IP. 192.168.0.1 for example</returns>
         private static string GetPrivateIpAddress()
         {
             NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
@@ -304,7 +358,11 @@ namespace MessengerServer.ViewModels
             }
             return null;
         }
-
+        /// <summary>
+        /// Validates provided string to be a proper IP:Port
+        /// </summary>
+        /// <param name="ipAddress">IP:Port</param>
+        /// <returns>Bool - true if string fit IP:port criteria, false if not.</returns>
         public static bool IsValidIP(string ipAddress)
         {
             //Checking that string pattern is valid for IP:port
@@ -339,5 +397,6 @@ namespace MessengerServer.ViewModels
             }
             return true;
         }
+        #endregion
     }
 }

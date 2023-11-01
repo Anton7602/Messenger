@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace MessengerClient.ViewModels
 {
+    /// <summary>
+    /// Base Implementation of ViewModel
+    /// </summary>
     class ViewModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;

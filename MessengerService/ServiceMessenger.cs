@@ -13,12 +13,17 @@ namespace MessengerService
     public class ServiceMessenger : IServiceMessenger
     {
         private enum MessengerEvent { MessageSent, ChatMemberJoined, ChatMemberLeft, ServerShutDown }
-        public List<User> userList = new List<User>();
+        private int currentID = 1;
+        private List<User> userList = new List<User>();
         public event EventHandler<Message> ServerMessageCallback;
         public event EventHandler<User> ServerUserAddedCallback;
         public event EventHandler<User> ServerUserRemovedCallback;
-        int currentID = 1;
 
+        /// <summary>
+        /// Handles connection of new user with provided Name
+        /// </summary>
+        /// <param name="name">Username</param>
+        /// <returns>Generated user ID</returns>
         public int Connect(string name)
         {
             User user = new User()
@@ -35,6 +40,10 @@ namespace MessengerService
             return user.ID;
         }
 
+        /// <summary>
+        /// Handles disconnection of user with provided userID
+        /// </summary>
+        /// <param name="id">User's ID</param>
         public void Disconnect(int id)
         {
             var user = userList.FirstOrDefault(x => x.ID == id);
@@ -47,6 +56,9 @@ namespace MessengerService
             }
         }
 
+        /// <summary>
+        /// Goes through the userList and force disconnects all clients from server
+        /// </summary>
         public void DisconnectAllClients()
         {
             List<User> tempUsers = new List<User>(userList);
@@ -56,6 +68,25 @@ namespace MessengerService
             }
         }
 
+        /// <summary>
+        /// Goes through provided list of users and force disconnects all of them
+        /// </summary>
+        /// <param name="unresponsiveUsers"></param>
+        private void DisconnectUnresponsiveUsers(List<User> unresponsiveUsers)
+        {
+            foreach (User disconnectedUser in unresponsiveUsers)
+            {
+                Disconnect(disconnectedUser.ID);
+                SendMessage("Lost connection with " + disconnectedUser.Name, 0);
+                ServerUserRemovedCallback?.Invoke(this, disconnectedUser);
+            }
+        }
+
+        /// <summary>
+        /// Handles sending message from user with provided ID
+        /// </summary>
+        /// <param name="messageText">Message's text</param>
+        /// <param name="id">Sender ID</param>
         public void SendMessage(string messageText, int id)
         {
             var sender = userList.FirstOrDefault(x => x.ID == id);
@@ -72,12 +103,19 @@ namespace MessengerService
             NotifyClientsAboutEvent(MessengerEvent.MessageSent, message);
         }
 
+        /// <summary>
+        /// Handles server shutdown Notifies all clients about it
+        /// </summary>
         public void ServiceWrapUp()
         {
             NotifyClientsAboutEvent(MessengerEvent.ServerShutDown, String.Empty);
             DisconnectAllClients();
         }
 
+        /// <summary>
+        /// Return users list
+        /// </summary>
+        /// <returns></returns>
         public List<string> GetUsersList()
         {
             List<string> list = new List<string>();
@@ -88,16 +126,11 @@ namespace MessengerService
             return list;
         }
 
-        private void DisconnectUnresponsiveUsers(List<User> unresponsiveUsers)
-        {
-            foreach (User disconnectedUser in unresponsiveUsers)
-            {
-                Disconnect(disconnectedUser.ID);
-                SendMessage("Lost connection with " + disconnectedUser.Name, 0);
-                ServerUserRemovedCallback?.Invoke(this, disconnectedUser);
-            }
-        }
-
+        /// <summary>
+        /// Goes through Users List and triggers proper callback depending on event
+        /// </summary>
+        /// <param name="notificationEvent">Messanger Event</param>
+        /// <param name="parameter">Message or Joined/Left User string</param>
         private void NotifyClientsAboutEvent(MessengerEvent notificationEvent, Object parameter) {
             List<User> unresponsiveUsers = new List<User>();
             foreach (User client in userList)

@@ -77,7 +77,6 @@
     </ApplicationDefinition>
     <Compile Include="Models\CustomNotificationActivator.cs" />
     <Compile Include="ViewModels\Base\BooleanToInverseConverter.cs" />
-    <Compile Include="ViewModels\Base\BoolToVisibilityConverter.cs" />
     <Compile Include="ViewModels\Base\RelayCommand.cs" />
     <Compile Include="ViewModels\Base\ViewModelBase.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />

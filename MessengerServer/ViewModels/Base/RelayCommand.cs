@@ -7,6 +7,10 @@ using System.Windows.Input;
 
 namespace MessengerServer.ViewModels
 {
+    /// <summary>
+    /// Base implementation of ViewModel Command that takes object as a parameter
+    /// </summary>
+    /// <typeparam name="T">Command Parameter</typeparam>
     internal class RelayCommand<T> : ICommand
     {
         private readonly Action<T> _execute;
