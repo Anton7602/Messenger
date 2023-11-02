@@ -87,6 +87,9 @@ namespace MessengerClient.Views
                 case "Connected":
                     StatusTextBox.BorderBrush = Brushes.DarkGreen;
                     break;
+                case "Establishing Connection":
+                    StatusTextBox.BorderBrush = Brushes.LightGreen;
+                    break;
                 case "Disconnected":
                     StatusTextBox.BorderBrush = Brushes.DarkGray;
                     break;

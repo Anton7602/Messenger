@@ -31,6 +31,7 @@ namespace MessengerServer.Views
             if (!char.IsDigit(e.Text, 0))
             {
                 e.Handled = true;
+                return;
             }
         }
 

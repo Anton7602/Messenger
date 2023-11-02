@@ -43,57 +43,57 @@ namespace MessengerServer.ViewModels
             }
         }
 
-        private int _ipAddressTextBoxTextFirst = 192;
-        public int IpAddressTextBoxTextFirst
+        private string _ipAddressTextBoxTextFirst = "192";
+        public string IpAddressTextBoxTextFirst
         {
             get { return _ipAddressTextBoxTextFirst; }
             set
             {
-                _ipAddressTextBoxTextFirst = value;
+                _ipAddressTextBoxTextFirst = ValidateIPOctetInput(value, _ipAddressTextBoxTextFirst);
                 OnPropertyChanged(nameof(IpAddressTextBoxTextFirst));
             }
         }
 
-        private int _ipAddressTextBoxTextSecond = 168;
-        public int IpAddressTextBoxTextSecond
+        private string _ipAddressTextBoxTextSecond = "168";
+        public string IpAddressTextBoxTextSecond
         {
             get { return _ipAddressTextBoxTextSecond; }
             set
             {
-                _ipAddressTextBoxTextSecond = value;
+                _ipAddressTextBoxTextSecond = ValidateIPOctetInput(value, _ipAddressTextBoxTextSecond);
                 OnPropertyChanged(nameof(IpAddressTextBoxTextSecond));
             }
         }
 
-        private int _ipAddressTextBoxTextThird = 0;
-        public int IpAddressTextBoxTextThird
+        private string _ipAddressTextBoxTextThird = "0";
+        public string IpAddressTextBoxTextThird
         {
             get { return _ipAddressTextBoxTextThird; }
             set
             {
-                _ipAddressTextBoxTextThird = value;
+                _ipAddressTextBoxTextThird = ValidateIPOctetInput(value, _ipAddressTextBoxTextThird);
                 OnPropertyChanged(nameof(IpAddressTextBoxTextThird));
             }
         }
 
-        private int _ipAddressTextBoxTextForth = 0;
-        public int IpAddressTextBoxTextForth
+        private string _ipAddressTextBoxTextForth = "0";
+        public string IpAddressTextBoxTextForth
         {
             get { return _ipAddressTextBoxTextForth; }
             set
             {
-                _ipAddressTextBoxTextForth = value;
+                _ipAddressTextBoxTextForth = ValidateIPOctetInput(value, _ipAddressTextBoxTextForth);
                 OnPropertyChanged(nameof(IpAddressTextBoxTextForth));
             }
         }
 
-        private int _portTextBoxText = 7602;
-        public int PortTextBoxText
+        private string _portTextBoxText = "7602";
+        public string PortTextBoxText
         {
             get { return _portTextBoxText; }
             set
             {
-                _portTextBoxText = value;
+                _portTextBoxText = ValidatePortInput(value, _portTextBoxText);
                 OnPropertyChanged(nameof(PortTextBoxText));
             }
         }
@@ -152,10 +152,10 @@ namespace MessengerServer.ViewModels
             string[] elementsOfIp = relevantIP.Split('.');
             if (elementsOfIp.Length == 4)
             {
-                IpAddressTextBoxTextFirst = int.Parse(elementsOfIp[0]);
-                IpAddressTextBoxTextSecond = int.Parse(elementsOfIp[1]);
-                IpAddressTextBoxTextThird = int.Parse(elementsOfIp[2]);
-                IpAddressTextBoxTextForth = int.Parse(elementsOfIp[3]);
+                IpAddressTextBoxTextFirst = elementsOfIp[0];
+                IpAddressTextBoxTextSecond = elementsOfIp[1];
+                IpAddressTextBoxTextThird = elementsOfIp[2];
+                IpAddressTextBoxTextForth = elementsOfIp[3];
             }
             Host.Messenger.ServerUserAddedCallback += UserAddedCallbackHandler;
             Host.Messenger.ServerUserRemovedCallback += UserRemovedCallbackHandler;
@@ -384,7 +384,7 @@ namespace MessengerServer.ViewModels
         /// </summary>
         /// <param name="ipAddress">IP:Port</param>
         /// <returns>Bool - true if string fit IP:port criteria, false if not.</returns>
-        public static bool IsValidIP(string ipAddress)
+        private static bool IsValidIP(string ipAddress)
         {
             //Checking that string pattern is valid for IP:port
             string pattern = @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}$";
@@ -417,6 +417,56 @@ namespace MessengerServer.ViewModels
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Method used to valided inputs on IP's textboxes. Prevents Ip values to go anywhere outside of range 1..255
+        /// </summary>
+        /// <returns>Valid IP octet value in range 0..255</returns>
+        private static string ValidateIPOctetInput(string textInput, string currentValue)
+        {
+            if (int.TryParse(textInput, out int numInput))
+            {
+                if (numInput > 255)
+                {
+                    return "255";
+                }
+                if (numInput < 0)
+                {
+                    return "";
+                }
+                if (currentValue.Equals("0") && textInput.Length==2)
+                {
+                    return textInput.Remove(textInput.IndexOf('0'), 1);
+                }
+                return textInput;
+            }
+            return currentValue;
+        }
+
+        /// <summary>
+        /// Method used to valided inputs on port textbox. Prevents port value to go anywhere outside of range 1..65535
+        /// </summary>
+        /// <returns>Valid port value in range 0..65535</returns>
+        private static string ValidatePortInput(string textInput, string currentValue)
+        {
+            if (int.TryParse(textInput, out int numInput))
+            {
+                if (numInput > 65535)
+                {
+                    return "65535";
+                }
+                if (numInput < 0)
+                {
+                    return "";
+                }
+                if (currentValue.Equals("0") && textInput.Length == 2)
+                {
+                    return textInput.Remove(textInput.IndexOf('0'), 1);
+                }
+                return textInput;
+            }
+            return currentValue;
         }
         #endregion
     }

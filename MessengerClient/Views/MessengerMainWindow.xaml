@@ -56,7 +56,7 @@
                         <dxe:SpinEdit HorizontalAlignment="Left" VerticalAlignment="Top" NullText="255" Width="50" MaxLength="3" IsEnabled="{Binding IsOnline, Converter={StaticResource BooleanToInverseConverter}}"
                                   EditValue="{Binding IpAddressTextBoxTextForth, UpdateSourceTrigger=PropertyChanged}" EditValueType="{x:Type sys:Int32}" IsFloatValue="False" MaxValue="255" MinValue="0"/>
                         <dx:DXImage Source="..\Resourses\dots.png" Height="20" VerticalAlignment="Top" Margin="2"/>
-                        <dxe:SpinEdit HorizontalAlignment="Left" VerticalAlignment="Top" NullText="65255" Width="70" HorizontalContentAlignment="Left" MaxLength="5" IsEnabled="{Binding IsOnline, Converter={StaticResource BooleanToInverseConverter}}"
+                        <dxe:SpinEdit HorizontalAlignment="Left" VerticalAlignment="Top" NullText="65255" Width="70" HorizontalContentAlignment="Left" IsEnabled="{Binding IsOnline, Converter={StaticResource BooleanToInverseConverter}}"
                                   EditValue="{Binding PortTextBoxText, UpdateSourceTrigger=PropertyChanged}" EditValueType="{x:Type sys:Int32}" IsFloatValue="False" MaxValue="65535" MinValue="0"/>
                     </dxlc:FlowLayoutControl>
                     <!--Username UI-->

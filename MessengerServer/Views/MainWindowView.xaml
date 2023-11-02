@@ -69,7 +69,8 @@
                                         <ColumnDefinition Width="2*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBox HorizontalAlignment="Stretch" Grid.Column="0"  Margin="2" Text="{Binding IpAddressTextBoxTextFirst, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsOnline, Converter={StaticResource falseToVisibility}}" MaxLength="3" PreviewTextInput="TextBox_PreviewTextInput"/>
+                                    <TextBox HorizontalAlignment="Stretch" Grid.Column="0"  Margin="2" Text="{Binding IpAddressTextBoxTextFirst, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsOnline, Converter={StaticResource falseToVisibility}}" 
+                                             MaxLength="3" PreviewTextInput="TextBox_PreviewTextInput"/>
                                     <TextBlock HorizontalAlignment="Center" Grid.Column="0"  Margin="3" Text="{Binding IpAddressTextBoxTextFirst}" Visibility="{Binding IsOnline, Converter={StaticResource trueToVisibility}}"/>
                                     <TextBlock Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Text="."/>
                                     <TextBox HorizontalAlignment="Stretch" Grid.Column="1"  Margin="2" Text="{Binding IpAddressTextBoxTextSecond, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsOnline, Converter={StaticResource falseToVisibility}}" MaxLength="3" PreviewTextInput="TextBox_PreviewTextInput"/>

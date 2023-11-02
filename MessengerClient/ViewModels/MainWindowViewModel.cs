@@ -16,8 +16,10 @@ namespace MessengerClient.ViewModels
     internal class MainWindowViewModel : ViewModelBase, IServiceMessengerCallback
     {
         #region Fields and Properties
-        private int durationBetweenPings = 1; //minutes
+        private BackgroundWorker backgroundWorker;
+        private int durationBetweenPings = 2; //minutes
         private Timer serverPingTimer;
+        private bool isConnecting = false;
         private int ID;
         ServiceMessenger.ServiceMessengerClient client;
 
@@ -43,57 +45,57 @@ namespace MessengerClient.ViewModels
             }
         }
 
-        private int _ipAddressTextBoxTextFirst = 192;
-        public int IpAddressTextBoxTextFirst
+        private string _ipAddressTextBoxTextFirst = "192";
+        public string IpAddressTextBoxTextFirst
         {
             get { return _ipAddressTextBoxTextFirst; }
             set
             {
-                _ipAddressTextBoxTextFirst = value;
+                _ipAddressTextBoxTextFirst = ValidateIPOctetInput(value, _ipAddressTextBoxTextFirst);
                 OnPropertyChanged(nameof(IpAddressTextBoxTextFirst));
             }
         }
 
-        private int _ipAddressTextBoxTextSecond = 168;
-        public int IpAddressTextBoxTextSecond
+        private string _ipAddressTextBoxTextSecond = "192";
+        public string IpAddressTextBoxTextSecond
         {
             get { return _ipAddressTextBoxTextSecond; }
             set
             {
-                _ipAddressTextBoxTextSecond = value;
+                _ipAddressTextBoxTextSecond = ValidateIPOctetInput(value, _ipAddressTextBoxTextSecond);
                 OnPropertyChanged(nameof(IpAddressTextBoxTextSecond));
             }
         }
 
-        private int _ipAddressTextBoxTextThird = 0;
-        public int IpAddressTextBoxTextThird
+        private string _ipAddressTextBoxTextThird = "0";
+        public string IpAddressTextBoxTextThird
         {
             get { return _ipAddressTextBoxTextThird; }
             set
             {
-                _ipAddressTextBoxTextThird = value;
+                _ipAddressTextBoxTextThird = ValidateIPOctetInput(value, _ipAddressTextBoxTextThird);
                 OnPropertyChanged(nameof(IpAddressTextBoxTextThird));
             }
         }
 
-        private int _ipAddressTextBoxTextForth = 0;
-        public int IpAddressTextBoxTextForth
+        private string _ipAddressTextBoxTextForth = "0";
+        public string IpAddressTextBoxTextForth
         {
             get { return _ipAddressTextBoxTextForth; }
             set
             {
-                _ipAddressTextBoxTextForth = value;
+                _ipAddressTextBoxTextForth = ValidateIPOctetInput(value, _ipAddressTextBoxTextForth);
                 OnPropertyChanged(nameof(IpAddressTextBoxTextForth));
             }
         }
 
-        private int _portTextBoxText = 7602;
-        public int PortTextBoxText
+        private string _portTextBoxText = "7602";
+        public string PortTextBoxText
         {
             get { return _portTextBoxText; }
             set
             {
-                _portTextBoxText = value;
+                _portTextBoxText = ValidatePortInput(value,_portTextBoxText);
                 OnPropertyChanged(nameof(PortTextBoxText));
             }
         }
@@ -143,6 +145,7 @@ namespace MessengerClient.ViewModels
         }
 
         public string CurrentURL => IpAddressTextBoxTextFirst + "." + IpAddressTextBoxTextSecond + "." + IpAddressTextBoxTextThird + "." + IpAddressTextBoxTextForth + ":" + PortTextBoxText;
+        private string connectionURL;
 
         public RelayCommand<object> connectionCommand { get; private set; }
         public RelayCommand<object> sendMessage { get; private set; }
@@ -157,10 +160,10 @@ namespace MessengerClient.ViewModels
             string[] elementsOfIp = relevantIP.Split('.');
             if (elementsOfIp.Length == 4)
             {
-                IpAddressTextBoxTextFirst = int.Parse(elementsOfIp[0]);
-                IpAddressTextBoxTextSecond = int.Parse(elementsOfIp[1]);
-                IpAddressTextBoxTextThird = int.Parse(elementsOfIp[2]);
-                IpAddressTextBoxTextForth = int.Parse(elementsOfIp[3]);
+                IpAddressTextBoxTextFirst = elementsOfIp[0];
+                IpAddressTextBoxTextSecond = elementsOfIp[1];
+                IpAddressTextBoxTextThird = elementsOfIp[2];
+                IpAddressTextBoxTextForth = elementsOfIp[3];
             }
 
             //Binding Commands to handler Methods
@@ -178,34 +181,57 @@ namespace MessengerClient.ViewModels
         {
             if (!IsOnline)
             {
-                StatusTextBoxText = "Establishing connection";
-                client = new ServiceMessengerClient(new System.ServiceModel.InstanceContext(this));
-                Uri connectAddress = new Uri($"net.tcp://{url}");
-                EndpointIdentity identity = EndpointIdentity.CreateUpnIdentity("DESKTOP-BTRBT9G\\Антон");
-                client.Endpoint.Address = new System.ServiceModel.EndpointAddress(connectAddress, identity);
                 if (IsUsernameVaild(UserNameTextBoxText))
                 {
+                    isConnecting = true;
+                    StatusTextBoxText = "Establishing connection";
+                    client = new ServiceMessengerClient(new System.ServiceModel.InstanceContext(this));
+                    Uri connectAddress = new Uri($"net.tcp://{url}");
+                    EndpointIdentity identity = EndpointIdentity.CreateUpnIdentity("DESKTOP-BTRBT9G\\Антон");
+                    client.Endpoint.Address = new System.ServiceModel.EndpointAddress(connectAddress, identity);
                     try
                     {
-                        ID = client.Connect(UserNameTextBoxText);
-                        serverPingTimer = new Timer(serverPingCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(durationBetweenPings));
-                        IsOnline = true;
-                        StatusTextBoxText = "Connected";
-                        UserList.Clear();
-                        foreach (var chatMember in client.GetUsersNamesList())
-                        {
-                            _userList.Add(chatMember);
-                        }
+                        backgroundWorker = new BackgroundWorker();
+                        backgroundWorker.DoWork += backgroundWorker_Connect;
+                        backgroundWorker.RunWorkerCompleted += backgroundWorker_ConnectionCompleted;
+                        backgroundWorker.RunWorkerAsync();
                     }
                     catch (Exception ex)
                     {
                         StatusTextBoxText = "Connection failed " + ex.Message;
+                        isConnecting = false;
                     }
                 } else
                 {
                     StatusTextBoxText = "Provided invalid username";
+                    isConnecting = false;
                 }
             }
+        }
+
+        private void backgroundWorker_Connect(object sender, DoWorkEventArgs e)
+        {
+            ID = client.Connect(UserNameTextBoxText);
+        }
+
+        private void backgroundWorker_ConnectionCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (ID > 0)
+            {
+                serverPingTimer = new Timer(serverPingCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(durationBetweenPings));
+                IsOnline = true;
+                StatusTextBoxText = "Connected";
+                UserList.Clear();
+                foreach (var chatMember in client.GetUsersNamesList())
+                {
+                    _userList.Add(chatMember);
+                }
+            }
+            else
+            {
+                StatusTextBoxText = "Username already used on server";
+            }
+            isConnecting = false;
         }
 
         /// <summary>
@@ -229,8 +255,9 @@ namespace MessengerClient.ViewModels
                 {
                     StatusTextBoxText = "Disconnected with errors";
                 }
-                IsOnline = false;
                 UserList.Clear();
+                IsOnline = false;
+                isConnecting = false;
             }
         }
 
@@ -250,22 +277,6 @@ namespace MessengerClient.ViewModels
                     Disconnect();
                     StatusTextBoxText = "Server stopped responding";
                 });
-            }
-        }
-
-        /// <summary>
-        /// Handler for connection ToggleButton command
-        /// </summary>
-        /// <param name="url">URL of Messenger Server</param>
-        private void HandleConnection(object url)
-        {
-            if (!IsOnline)
-            {
-                Connect(url.ToString());
-
-            } else
-            {
-                Disconnect();
             }
         }
 
@@ -297,6 +308,26 @@ namespace MessengerClient.ViewModels
         #endregion
 
         #region UIMethods
+        /// <summary>
+        /// Handler for connection ToggleButton command
+        /// </summary>
+        /// <param name="url">URL of Messenger Server</param>
+        private void HandleConnection(object url)
+        {
+            if (!isConnecting)
+            {
+                isConnecting = true;
+                if (!IsOnline)
+                {
+                    Connect(url.ToString());
+                }
+                else
+                {
+                    Disconnect();
+                }
+            }
+        }
+
         /// <summary>
         /// Checks if provided username if valid
         /// </summary>
@@ -362,6 +393,60 @@ namespace MessengerClient.ViewModels
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Method used to valided inputs on IP's textboxes. Prevents Ip values to go anywhere outside of range 1..255
+        /// </summary>
+        /// <returns>Valid IP octet value in range 0..255</returns>
+        private static string ValidateIPOctetInput(string textInput, string currentValue)
+        {
+            if (textInput.Length>3)
+            {
+                return currentValue;
+            }
+            if (int.TryParse(textInput, out int numInput))
+            {
+                if (numInput > 255)
+                {
+                    return "255";
+                }
+                if (numInput < 0)
+                {
+                    return "";
+                }
+                if (currentValue.Equals("0") && textInput.Length == 2)
+                {
+                    return textInput.Remove(textInput.IndexOf('0'), 1);
+                }
+                return textInput;
+            }
+            return currentValue;
+        }
+
+        /// <summary>
+        /// Method used to valided inputs on port textbox. Prevents port value to go anywhere outside of range 1..65535
+        /// </summary>
+        /// <returns>Valid port value in range 0..65535</returns>
+        private static string ValidatePortInput(string textInput, string currentValue)
+        {
+            if (int.TryParse(textInput, out int numInput))
+            {
+                if (numInput > 65535)
+                {
+                    return "65535";
+                }
+                if (numInput < 0)
+                {
+                    return "";
+                }
+                if (currentValue.Equals("0") && textInput.Length == 2)
+                {
+                    return textInput.Remove(textInput.IndexOf('0'), 1);
+                }
+                return textInput;
+            }
+            return currentValue;
         }
         #endregion
 

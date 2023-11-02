@@ -27,6 +27,13 @@ namespace MessengerService
         /// <returns>Generated user ID</returns>
         public int Connect(string name)
         {
+            foreach (User client in userList)
+            {
+                if (client.Name == name)
+                {
+                    return -1; // Name is already taken
+                }
+            }
             User user = new User()
             {
                 ID = currentID,
