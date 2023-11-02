@@ -484,7 +484,10 @@ namespace MessengerClient.ViewModels
         {
             if (message!=null)
             {
-                MessagesList.Add(message);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    MessagesList.Add(message);
+                });
             }
         }
 
@@ -496,7 +499,10 @@ namespace MessengerClient.ViewModels
         {
             if (chatMember != null && UserList.Contains(chatMember))
             {
-                UserList.Remove(chatMember);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    UserList.Remove(chatMember);
+                });
             }
         }
 
@@ -508,7 +514,10 @@ namespace MessengerClient.ViewModels
         {
             if (chatMember!=null)
             {
-                UserList.Add(chatMember);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    UserList.Add(chatMember);
+                });
             }
         }
 
@@ -518,7 +527,10 @@ namespace MessengerClient.ViewModels
         public void ServerShutDownCallback()
         {
             Disconnect();
-            StatusTextBoxText = "Server went offline";
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                StatusTextBoxText = "Server went offline";
+            });
         }
 
         /// <summary>
