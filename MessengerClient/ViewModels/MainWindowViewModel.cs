@@ -255,9 +255,12 @@ namespace MessengerClient.ViewModels
                 {
                     StatusTextBoxText = "Disconnected with errors";
                 }
-                UserList.Clear();
-                IsOnline = false;
-                isConnecting = false;
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    UserList.Clear();
+                    IsOnline = false;
+                    isConnecting = false;
+                });
             }
         }
 
