@@ -20,7 +20,7 @@ namespace MessengerClient.ViewModels
         private int durationBetweenPings = 2; //minutes
         private Timer serverPingTimer;
         private bool isConnecting = false;
-        private int ID;
+        private int ID = -2;
         ServiceMessenger.ServiceMessengerClient client;
 
         private ObservableCollection<string> _userList = new ObservableCollection<string>();
@@ -184,23 +184,16 @@ namespace MessengerClient.ViewModels
                 if (IsUsernameVaild(UserNameTextBoxText))
                 {
                     isConnecting = true;
-                    StatusTextBoxText = "Establishing connection";
+                    StatusTextBoxText = "Connecting";
                     client = new ServiceMessengerClient(new System.ServiceModel.InstanceContext(this));
                     Uri connectAddress = new Uri($"net.tcp://{url}");
                     EndpointIdentity identity = EndpointIdentity.CreateUpnIdentity("DESKTOP-BTRBT9G\\Антон");
                     client.Endpoint.Address = new System.ServiceModel.EndpointAddress(connectAddress, identity);
-                    try
-                    {
-                        backgroundWorker = new BackgroundWorker();
-                        backgroundWorker.DoWork += backgroundWorker_Connect;
-                        backgroundWorker.RunWorkerCompleted += backgroundWorker_ConnectionCompleted;
-                        backgroundWorker.RunWorkerAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        StatusTextBoxText = "Connection failed " + ex.Message;
-                        isConnecting = false;
-                    }
+                    backgroundWorker = new BackgroundWorker();
+                    backgroundWorker.DoWork += backgroundWorker_Connect;
+                    backgroundWorker.RunWorkerCompleted += backgroundWorker_ConnectionCompleted;
+                    backgroundWorker.RunWorkerAsync();
+                    isConnecting = false;
                 } else
                 {
                     StatusTextBoxText = "Provided invalid username";
@@ -211,7 +204,13 @@ namespace MessengerClient.ViewModels
 
         private void backgroundWorker_Connect(object sender, DoWorkEventArgs e)
         {
-            ID = client.Connect(UserNameTextBoxText);
+            try
+            {
+                ID = client.Connect(UserNameTextBoxText);
+            } catch (Exception ex)
+            {
+                ID = -2;
+            }
         }
 
         private void backgroundWorker_ConnectionCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -227,9 +226,12 @@ namespace MessengerClient.ViewModels
                     _userList.Add(chatMember);
                 }
             }
-            else
+            else if (ID == -1)
             {
                 StatusTextBoxText = "Username already used on server";
+            } else
+            {
+                StatusTextBoxText = "Connection failed ";
             }
             isConnecting = false;
         }
@@ -249,6 +251,7 @@ namespace MessengerClient.ViewModels
                 try
                 {
                     client.Disconnect(ID);
+                    ID = -2;
                     StatusTextBoxText = "Disconnected";
                 }
                 catch 

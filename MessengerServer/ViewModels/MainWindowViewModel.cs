@@ -3,6 +3,7 @@ using MessengerService;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -18,8 +19,10 @@ namespace MessengerServer.ViewModels
     {
         #region Fields and Properties
         private readonly MessengerServiceHost Host = new MessengerServiceHost();
+        private BackgroundWorker backgroundWorker;
         private int durationBetweenPings = 1; // Minutes
         private Timer pingTimer;
+        private bool isConnecting = false;
 
         private ObservableCollection<string> _userList = new ObservableCollection<string>();
         public ObservableCollection<string> UserList 
@@ -174,7 +177,7 @@ namespace MessengerServer.ViewModels
         {
             if (!IsOnline)
             {
-                StatusTextBoxText = "Establishing connection";
+                StatusTextBoxText = "Starting server";
                 if (IsValidIP(url as string))
                 {
                     try
@@ -199,6 +202,7 @@ namespace MessengerServer.ViewModels
                 {
                     StatusTextBoxText = "Provided invalid IP/Port";
                 }
+                isConnecting = false;
             }
         }
 
@@ -207,16 +211,29 @@ namespace MessengerServer.ViewModels
         /// </summary>
         public void Disconnect()
         {
-            StatusTextBoxText = "Disrupting connection";
+            StatusTextBoxText = "Closing server";
             if (pingTimer!=null)
             {
                 pingTimer.Dispose();
             }
             Host.Messenger.ServiceWrapUp();
+            backgroundWorker = new BackgroundWorker();
+            backgroundWorker.DoWork += BackgroundWorker_Disconnect;
+            backgroundWorker.RunWorkerCompleted += BackgroundWorker_DisconnectionCompleted;
+            backgroundWorker.RunWorkerAsync();
+        }
+
+        private void BackgroundWorker_Disconnect(object sender, DoWorkEventArgs e)
+        {
             Host.stopService();
+        }
+
+        private void BackgroundWorker_DisconnectionCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
             _userList.Clear();
             StatusTextBoxText = "Offline";
             IsOnline = false;
+            isConnecting = false;
         }
 
         /// <summary>
@@ -237,13 +254,17 @@ namespace MessengerServer.ViewModels
         /// <param name="url">URL of Messenger Server</param>
         private void HandleConnection(object url)
         {
-            if (!IsOnline)
+            if (!isConnecting)
             {
-                Connect(url.ToString());
-            }
-            else
-            {
-                Disconnect();
+                isConnecting = true;
+                if (!IsOnline)
+                {
+                    Connect(url.ToString());
+                }
+                else
+                {
+                    Disconnect();
+                }
             }
         }
 
