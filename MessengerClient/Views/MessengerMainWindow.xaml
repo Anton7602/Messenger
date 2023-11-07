@@ -26,9 +26,9 @@
                          dxlc:DockLayoutControl.AllowVerticalSizing="True"
                          Height="Auto" 
                          Header="Settings">
-                <dxlc:FlowLayoutControl Orientation="Horizontal" Padding="0" VerticalAlignment="Top">
+                <dxlc:FlowLayoutControl Orientation="Horizontal" Padding="0" VerticalAlignment="Top" >
                     <!--Ip:Port UI-->
-                    <dxlc:FlowLayoutControl Orientation="Horizontal" Padding="0" VerticalAlignment="Top" Margin="0 0 30 0">
+                    <dxlc:FlowLayoutControl Orientation="Horizontal" Padding="0" VerticalAlignment="Top" Margin="0 0 40 0" MinWidth="380">
                         <dx:SimpleButton Height="25" Margin="0 0 30 0" BorderThickness="0" ButtonKind="Toggle" IsChecked="{Binding IsOnline, Mode=OneWay}" Command="{Binding connectionCommand}" CommandParameter="{Binding CurrentURL}" Cursor="Hand">
                             <dx:SimpleButton.Style>
                                 <Style TargetType="dx:SimpleButton">
@@ -44,17 +44,8 @@
                             </dx:SimpleButton.Style>
                         </dx:SimpleButton>
                         <dx:DXImage Source="..\Resourses\ip.png" Height="20" VerticalAlignment="Top" Margin="5 2"/>
-                        <dxe:SpinEdit HorizontalAlignment="Left" VerticalAlignment="Top" NullText="255" Width="50" MaxLength="3" IsEnabled="{Binding IsOnline, Converter={StaticResource BooleanToInverseConverter}}"
-                                  EditValue="{Binding IpAddressTextBoxTextFirst, UpdateSourceTrigger=PropertyChanged}" EditValueType="{x:Type sys:Int32}" IsFloatValue="False" MaxValue="255" MinValue="0"/>
-                        <dx:DXImage Source="..\Resourses\dot.png" Height="5" VerticalAlignment="Top" Margin="2 15"/>
-                        <dxe:SpinEdit HorizontalAlignment="Left" VerticalAlignment="Top" NullText="255" Width="50" MaxLength="3" IsEnabled="{Binding IsOnline, Converter={StaticResource BooleanToInverseConverter}}"
-                                  EditValue="{Binding IpAddressTextBoxTextSecond, UpdateSourceTrigger=PropertyChanged}" EditValueType="{x:Type sys:Int32}" IsFloatValue="False" MaxValue="255" MinValue="0"/>
-                        <dx:DXImage Source="..\Resourses\dot.png" Height="5" VerticalAlignment="Top" Margin="2 15"/>
-                        <dxe:SpinEdit HorizontalAlignment="Left" VerticalAlignment="Top" NullText="255" Width="50" MaxLength="3" IsEnabled="{Binding IsOnline, Converter={StaticResource BooleanToInverseConverter}}"
-                                  EditValue="{Binding IpAddressTextBoxTextThird, UpdateSourceTrigger=PropertyChanged}" EditValueType="{x:Type sys:Int32}" IsFloatValue="False" MaxValue="255" MinValue="0"/>
-                        <dx:DXImage Source="..\Resourses\dot.png" Height="5" VerticalAlignment="Top" Margin="2 15"/>
-                        <dxe:SpinEdit HorizontalAlignment="Left" VerticalAlignment="Top" NullText="255" Width="50" MaxLength="3" IsEnabled="{Binding IsOnline, Converter={StaticResource BooleanToInverseConverter}}"
-                                  EditValue="{Binding IpAddressTextBoxTextForth, UpdateSourceTrigger=PropertyChanged}" EditValueType="{x:Type sys:Int32}" IsFloatValue="False" MaxValue="255" MinValue="0"/>
+                        <dxe:TextEdit HorizontalAlignment="Left" VerticalAlignment="Top" NullText="192.168.0.1" Width="150" IsEnabled="{Binding IsOnline, Converter={StaticResource BooleanToInverseConverter}}"
+                                  EditValue="{Binding IpAddressTextBoxText, UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Center" CausesValidation="True" Validate="IPaddress_Validate"/>
                         <dx:DXImage Source="..\Resourses\dots.png" Height="20" VerticalAlignment="Top" Margin="2"/>
                         <dxe:SpinEdit HorizontalAlignment="Left" VerticalAlignment="Top" NullText="65255" Width="70" HorizontalContentAlignment="Left" IsEnabled="{Binding IsOnline, Converter={StaticResource BooleanToInverseConverter}}"
                                   EditValue="{Binding PortTextBoxText, UpdateSourceTrigger=PropertyChanged}" EditValueType="{x:Type sys:Int32}" IsFloatValue="False" MaxValue="65535" MinValue="0"/>

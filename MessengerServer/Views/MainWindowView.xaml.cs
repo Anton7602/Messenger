@@ -28,7 +28,7 @@ namespace MessengerServer.Views
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            if (!char.IsDigit(e.Text, 0))
+            if (!(char.IsDigit(e.Text, 0) || e.Text.First().Equals('.')))
             {
                 e.Handled = true;
                 return;

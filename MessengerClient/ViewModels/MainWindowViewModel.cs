@@ -45,47 +45,14 @@ namespace MessengerClient.ViewModels
             }
         }
 
-        private string _ipAddressTextBoxTextFirst = "192";
-        public string IpAddressTextBoxTextFirst
+        private string _ipAddressTextBoxText = "192.168.1.1";
+        public string IpAddressTextBoxText
         {
-            get { return _ipAddressTextBoxTextFirst; }
+            get { return _ipAddressTextBoxText; }
             set
             {
-                _ipAddressTextBoxTextFirst = ValidateIPOctetInput(value, _ipAddressTextBoxTextFirst);
-                OnPropertyChanged(nameof(IpAddressTextBoxTextFirst));
-            }
-        }
-
-        private string _ipAddressTextBoxTextSecond = "192";
-        public string IpAddressTextBoxTextSecond
-        {
-            get { return _ipAddressTextBoxTextSecond; }
-            set
-            {
-                _ipAddressTextBoxTextSecond = ValidateIPOctetInput(value, _ipAddressTextBoxTextSecond);
-                OnPropertyChanged(nameof(IpAddressTextBoxTextSecond));
-            }
-        }
-
-        private string _ipAddressTextBoxTextThird = "0";
-        public string IpAddressTextBoxTextThird
-        {
-            get { return _ipAddressTextBoxTextThird; }
-            set
-            {
-                _ipAddressTextBoxTextThird = ValidateIPOctetInput(value, _ipAddressTextBoxTextThird);
-                OnPropertyChanged(nameof(IpAddressTextBoxTextThird));
-            }
-        }
-
-        private string _ipAddressTextBoxTextForth = "0";
-        public string IpAddressTextBoxTextForth
-        {
-            get { return _ipAddressTextBoxTextForth; }
-            set
-            {
-                _ipAddressTextBoxTextForth = ValidateIPOctetInput(value, _ipAddressTextBoxTextForth);
-                OnPropertyChanged(nameof(IpAddressTextBoxTextForth));
+                _ipAddressTextBoxText = value;
+                OnPropertyChanged(nameof(IpAddressTextBoxText));
             }
         }
 
@@ -144,7 +111,7 @@ namespace MessengerClient.ViewModels
             }
         }
 
-        public string CurrentURL => IpAddressTextBoxTextFirst + "." + IpAddressTextBoxTextSecond + "." + IpAddressTextBoxTextThird + "." + IpAddressTextBoxTextForth + ":" + PortTextBoxText;
+        public string CurrentURL => IpAddressTextBoxText + ":" + PortTextBoxText;
         private string connectionURL;
 
         public RelayCommand<object> connectionCommand { get; private set; }
@@ -156,15 +123,7 @@ namespace MessengerClient.ViewModels
         public MainWindowViewModel()
         {
             //Attempt to prefill proper IP
-            string relevantIP = GetPrivateIpAddress();
-            string[] elementsOfIp = relevantIP.Split('.');
-            if (elementsOfIp.Length == 4)
-            {
-                IpAddressTextBoxTextFirst = elementsOfIp[0];
-                IpAddressTextBoxTextSecond = elementsOfIp[1];
-                IpAddressTextBoxTextThird = elementsOfIp[2];
-                IpAddressTextBoxTextForth = elementsOfIp[3];
-            }
+            IpAddressTextBoxText = GetPrivateIpAddress();
 
             //Binding Commands to handler Methods
             connectionCommand = new RelayCommand<object>(HandleConnection);

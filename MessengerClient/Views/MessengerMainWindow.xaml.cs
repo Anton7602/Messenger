@@ -99,13 +99,28 @@ namespace MessengerClient.Views
             }
         }
 
+        private void IPaddress_Validate(object sender, DevExpress.Xpf.Editors.ValidationEventArgs e)
+        {
+            string ipAddress = e.Value as string;
 
-        /// <summary>
-        /// Triggers on Messenges collection update and scrolls MessagesHolder to a last position
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MessagesUpdated(object sender, NotifyCollectionChangedEventArgs e)
+            bool isValid = Regex.IsMatch(ipAddress, @"^([01]?\d\d?|2[0-4]\d|25[0-5])(?:\.(?:[01]?\d\d?|2[0-4]\d|25[0-5])){3}?$");
+
+            if (!isValid)
+            {
+                e.IsValid = false;
+                e.ErrorType = DevExpress.XtraEditors.DXErrorProvider.ErrorType.Critical;
+                e.ErrorContent = "Invalid IP address. Follow IPv4 template, for example 192.168.0.1";
+            }
+
+        }
+
+
+            /// <summary>
+            /// Triggers on Messenges collection update and scrolls MessagesHolder to a last position
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="e"></param>
+            private void MessagesUpdated(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (MessageHolder.VisibleItems.Count>1)
             {
